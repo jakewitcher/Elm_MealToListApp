@@ -23,7 +23,8 @@ type alias Model =
     { name : String
     , meal : String
     , ingredient : String
-    , amount : Maybe Float
+    , amount : Float
+    , ingredientList : List Ingredient
     , userList : List User
     }
 
@@ -59,7 +60,7 @@ type alias GroceryList =
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( { name = "", meal = "", ingredient = "", amount = Nothing, userList = [] }, Cmd.none )
+    ( { name = "", meal = "", ingredient = "", amount = 0, ingredientList = [], userList = [] }, Cmd.none )
 
 
 
@@ -73,7 +74,7 @@ type Msg
     | DeleteUser
     | Logout
     | IngredientNameInput String
-    | IngredientAmountInput Float
+    | IngredientAmountInput String
     | AddIngredient
     | SaveMeal
     | AddMeal Meal
@@ -90,8 +91,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         UserNameInput name ->
-            Debug.log "Input user name"
-                ( { model | name = name }, Cmd.none )
+            ( { model | name = name }, Cmd.none )
 
         SaveUser ->
             if String.isEmpty model.name then
@@ -99,6 +99,22 @@ update msg model =
 
             else
                 ( save model, Cmd.none )
+
+        IngredientNameInput ingredient ->
+            ( { model | ingredient = ingredient }, Cmd.none )
+
+        IngredientAmountInput amount ->
+            ( { model | amount = Maybe.withDefault 0 (String.toFloat amount) }, Cmd.none )
+
+        AddIngredient ->
+            Debug.log "Ingredient Added"
+                ( { model
+                    | ingredientList = Ingredient model.ingredient model.amount :: model.ingredientList
+                    , ingredient = ""
+                    , amount = 0
+                  }
+                , Cmd.none
+                )
 
         _ ->
             ( model, Cmd.none )
@@ -203,7 +219,7 @@ userHeader model =
 
 mealForm : Model -> Html Msg
 mealForm model =
-    Html.form [ onSubmit SaveMeal ]
+    Html.form [ onSubmit AddIngredient ]
         [ input
             [ type_ "text"
             , placeholder "Add new ingredient"
@@ -211,5 +227,12 @@ mealForm model =
             , value model.ingredient
             ]
             []
-        , button [ type_ "submit" ] [ text "Save" ]
+        , input
+            [ type_ "text"
+            , placeholder "Amount"
+            , onInput IngredientAmountInput
+            , value (String.fromFloat model.amount)
+            ]
+            []
+        , button [ type_ "submit" ] [ text "Add" ]
         ]

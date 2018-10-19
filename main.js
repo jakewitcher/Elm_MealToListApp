@@ -4289,7 +4289,6 @@ function _Browser_load(url)
 		}
 	}));
 }
-var elm$core$Maybe$Nothing = {$: 'Nothing'};
 var elm$core$Basics$False = {$: 'False'};
 var elm$core$Basics$True = {$: 'True'};
 var elm$core$Result$isOk = function (result) {
@@ -4553,6 +4552,7 @@ var elm$core$Array$initialize = F2(
 var elm$core$Maybe$Just = function (a) {
 	return {$: 'Just', a: a};
 };
+var elm$core$Maybe$Nothing = {$: 'Nothing'};
 var elm$core$Result$Err = function (a) {
 	return {$: 'Err', a: a};
 };
@@ -4768,7 +4768,7 @@ var elm$core$Platform$Cmd$batch = _Platform_batch;
 var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
 var author$project$Main$init = function (_n0) {
 	return _Utils_Tuple2(
-		{amount: elm$core$Maybe$Nothing, ingredient: '', meal: '', name: '', userList: _List_Nil},
+		{amount: 0, ingredient: '', ingredientList: _List_Nil, meal: '', name: '', userList: _List_Nil},
 		elm$core$Platform$Cmd$none);
 };
 var elm$core$Platform$Sub$batch = _Platform_batch;
@@ -4776,6 +4776,10 @@ var elm$core$Platform$Sub$none = elm$core$Platform$Sub$batch(_List_Nil);
 var author$project$Main$subscriptions = function (model) {
 	return elm$core$Platform$Sub$none;
 };
+var author$project$Main$Ingredient = F2(
+	function (name, amount) {
+		return {amount: amount, name: name};
+	});
 var author$project$Main$User = F4(
 	function (name, userId, groceryList, mealList) {
 		return {groceryList: groceryList, mealList: mealList, name: name, userId: userId};
@@ -4796,34 +4800,80 @@ var author$project$Main$save = function (model) {
 	return author$project$Main$add(model);
 };
 var elm$core$Debug$log = _Debug_log;
+var elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
 var elm$core$String$isEmpty = function (string) {
 	return string === '';
 };
+var elm$core$String$toFloat = _String_toFloat;
 var author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
 			case 'UserNameInput':
 				var name = msg.a;
-				return A2(
-					elm$core$Debug$log,
-					'Input user name',
-					_Utils_Tuple2(
-						_Utils_update(
-							model,
-							{name: name}),
-						elm$core$Platform$Cmd$none));
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{name: name}),
+					elm$core$Platform$Cmd$none);
 			case 'SaveUser':
 				return elm$core$String$isEmpty(model.name) ? _Utils_Tuple2(model, elm$core$Platform$Cmd$none) : _Utils_Tuple2(
 					author$project$Main$save(model),
 					elm$core$Platform$Cmd$none);
+			case 'IngredientNameInput':
+				var ingredient = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{ingredient: ingredient}),
+					elm$core$Platform$Cmd$none);
+			case 'IngredientAmountInput':
+				var amount = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							amount: A2(
+								elm$core$Maybe$withDefault,
+								0,
+								elm$core$String$toFloat(amount))
+						}),
+					elm$core$Platform$Cmd$none);
+			case 'AddIngredient':
+				return A2(
+					elm$core$Debug$log,
+					'Ingredient Added',
+					_Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								amount: 0,
+								ingredient: '',
+								ingredientList: A2(
+									elm$core$List$cons,
+									A2(author$project$Main$Ingredient, model.ingredient, model.amount),
+									model.ingredientList)
+							}),
+						elm$core$Platform$Cmd$none));
 			default:
 				return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 		}
 	});
+var author$project$Main$AddIngredient = {$: 'AddIngredient'};
+var author$project$Main$IngredientAmountInput = function (a) {
+	return {$: 'IngredientAmountInput', a: a};
+};
 var author$project$Main$IngredientNameInput = function (a) {
 	return {$: 'IngredientNameInput', a: a};
 };
-var author$project$Main$SaveMeal = {$: 'SaveMeal'};
+var elm$core$String$fromFloat = _String_fromNumber;
 var elm$core$Basics$identity = function (x) {
 	return x;
 };
@@ -4974,7 +5024,7 @@ var author$project$Main$mealForm = function (model) {
 		elm$html$Html$form,
 		_List_fromArray(
 			[
-				elm$html$Html$Events$onSubmit(author$project$Main$SaveMeal)
+				elm$html$Html$Events$onSubmit(author$project$Main$AddIngredient)
 			]),
 		_List_fromArray(
 			[
@@ -4989,6 +5039,17 @@ var author$project$Main$mealForm = function (model) {
 					]),
 				_List_Nil),
 				A2(
+				elm$html$Html$input,
+				_List_fromArray(
+					[
+						elm$html$Html$Attributes$type_('text'),
+						elm$html$Html$Attributes$placeholder('Amount'),
+						elm$html$Html$Events$onInput(author$project$Main$IngredientAmountInput),
+						elm$html$Html$Attributes$value(
+						elm$core$String$fromFloat(model.amount))
+					]),
+				_List_Nil),
+				A2(
 				elm$html$Html$button,
 				_List_fromArray(
 					[
@@ -4996,7 +5057,7 @@ var author$project$Main$mealForm = function (model) {
 					]),
 				_List_fromArray(
 					[
-						elm$html$Html$text('Save')
+						elm$html$Html$text('Add')
 					]))
 			]));
 };
