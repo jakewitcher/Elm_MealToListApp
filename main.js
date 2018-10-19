@@ -4790,7 +4790,7 @@ var author$project$Main$add = function (model) {
 	var newUserList = A2(elm$core$List$cons, newUser, model.userList);
 	return _Utils_update(
 		model,
-		{name: '', userList: newUserList});
+		{userList: newUserList});
 };
 var author$project$Main$save = function (model) {
 	return author$project$Main$add(model);
@@ -5035,7 +5035,94 @@ var author$project$Main$userForm = function (model) {
 					]))
 			]));
 };
+var author$project$Main$Logout = {$: 'Logout'};
 var elm$html$Html$div = _VirtualDom_node('div');
+var elm$html$Html$header = _VirtualDom_node('header');
+var elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			elm$virtual_dom$VirtualDom$on,
+			event,
+			elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		elm$html$Html$Events$on,
+		'click',
+		elm$json$Json$Decode$succeed(msg));
+};
+var author$project$Main$userHeader = function (model) {
+	return A2(
+		elm$html$Html$div,
+		_List_Nil,
+		_List_fromArray(
+			[
+				A2(
+				elm$html$Html$header,
+				_List_Nil,
+				_List_fromArray(
+					[
+						elm$html$Html$text(model.name)
+					])),
+				A2(
+				elm$html$Html$button,
+				_List_fromArray(
+					[
+						elm$html$Html$Attributes$type_('button'),
+						elm$html$Html$Events$onClick(author$project$Main$Logout)
+					]),
+				_List_fromArray(
+					[
+						elm$html$Html$text('Logout')
+					]))
+			]));
+};
+var elm$core$List$map = F2(
+	function (f, xs) {
+		return A3(
+			elm$core$List$foldr,
+			F2(
+				function (x, acc) {
+					return A2(
+						elm$core$List$cons,
+						f(x),
+						acc);
+				}),
+			_List_Nil,
+			xs);
+	});
+var author$project$Main$userNames = function (model) {
+	return A2(
+		elm$core$List$map,
+		function (user) {
+			return user.name;
+		},
+		model.userList);
+};
+var elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2(elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var author$project$Main$validate = function (model) {
+	var login = model.name;
+	var isUser = A2(
+		elm$core$List$filter,
+		function (name) {
+			return _Utils_eq(name, login);
+		},
+		author$project$Main$userNames(model));
+	return _Utils_eq(isUser, _List_Nil) ? false : true;
+};
 var elm$html$Html$h1 = _VirtualDom_node('h1');
 var author$project$Main$view = function (model) {
 	return {
@@ -5054,7 +5141,7 @@ var author$project$Main$view = function (model) {
 								elm$html$Html$text('Meal to List App')
 							]))
 					])),
-				author$project$Main$userForm(model),
+				author$project$Main$validate(model) ? author$project$Main$userHeader(model) : author$project$Main$userForm(model),
 				author$project$Main$mealForm(model)
 			]),
 		title: 'Meal to List App'
@@ -5083,20 +5170,6 @@ var elm$core$Task$Perform = function (a) {
 };
 var elm$core$Task$succeed = _Scheduler_succeed;
 var elm$core$Task$init = elm$core$Task$succeed(_Utils_Tuple0);
-var elm$core$List$map = F2(
-	function (f, xs) {
-		return A3(
-			elm$core$List$foldr,
-			F2(
-				function (x, acc) {
-					return A2(
-						elm$core$List$cons,
-						f(x),
-						acc);
-				}),
-			_List_Nil,
-			xs);
-	});
 var elm$core$Task$andThen = _Scheduler_andThen;
 var elm$core$Task$map = F2(
 	function (func, taskA) {

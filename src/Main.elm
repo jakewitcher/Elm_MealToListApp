@@ -71,6 +71,7 @@ type Msg
     | SaveUser
     | EditUser User
     | DeleteUser
+    | Logout
     | IngredientNameInput String
     | IngredientAmountInput Float
     | AddIngredient
@@ -119,7 +120,6 @@ add model =
     in
     { model
         | userList = newUserList
-        , name = ""
     }
 
 
@@ -147,10 +147,35 @@ view model =
     { title = "Meal to List App"
     , body =
         [ div [] [ h1 [] [ text "Meal to List App" ] ]
-        , userForm model
+        , if validate model then
+            userHeader model
+
+          else
+            userForm model
         , mealForm model
         ]
     }
+
+
+userNames : Model -> List String
+userNames model =
+    List.map (\user -> user.name) model.userList
+
+
+validate : Model -> Bool
+validate model =
+    let
+        login =
+            model.name
+
+        isUser =
+            List.filter (\name -> name == login) (userNames model)
+    in
+    if isUser == [] then
+        False
+
+    else
+        True
 
 
 userForm : Model -> Html Msg
@@ -164,6 +189,15 @@ userForm model =
             ]
             []
         , button [ type_ "submit" ] [ text "Save" ]
+        ]
+
+
+userHeader : Model -> Html Msg
+userHeader model =
+    div []
+        [ header [] [ text model.name ]
+        , button [ type_ "button", onClick Logout ]
+            [ text "Logout" ]
         ]
 
 
