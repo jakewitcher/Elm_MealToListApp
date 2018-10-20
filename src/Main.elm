@@ -1,4 +1,4 @@
-module Main exposing (Document, GroceryList, Ingredient, Meal, Model, Msg(..), init, main, subscriptions, update, view)
+module Main exposing (Document, Grocery, Ingredient, Meal, Model, Msg(..), init, main, subscriptions, update, view)
 
 import Browser
 import Html exposing (..)
@@ -20,47 +20,38 @@ main =
 
 
 type alias Model =
-    { name : String
-    , meal : String
+    { meal : String
     , ingredient : String
     , amount : Float
+    , unit : String
     , ingredientList : List Ingredient
-    , userList : List User
-    }
-
-
-type alias User =
-    { name : String
-    , userId : Int
-    , groceryList : List GroceryList
     , mealList : List Meal
-    }
-
-
-type alias Meal =
-    { name : String
-    , ingredientList : List Ingredient
-    , mealId : Int
-    , user : Int
+    , groceryList : List Grocery
     }
 
 
 type alias Ingredient =
     { name : String
     , amount : Float
+    , unit : String
     }
 
 
-type alias GroceryList =
+type alias Meal =
     { name : String
-    , listId : Int
+    , ingredientList : List Ingredient
+    }
+
+
+type alias Grocery =
+    { name : String
     , meals : List Meal
     }
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( { name = "", meal = "", ingredient = "", amount = 0, ingredientList = [], userList = [] }, Cmd.none )
+    ( { meal = "", ingredient = "", amount = 0, unit = "", ingredientList = [], mealList = [], groceryList = [] }, Cmd.none )
 
 
 
@@ -68,74 +59,72 @@ init _ =
 
 
 type Msg
-    = UserNameInput String
-    | SaveUser
-    | EditUser User
-    | DeleteUser
-    | Logout
-    | IngredientNameInput String
+    = IngredientNameInput String
     | IngredientAmountInput String
+    | IngredientunitInput String
+    | MealNameInput String
     | AddIngredient
     | SaveMeal
-    | AddMeal Meal
-    | SaveGroceryList GroceryList
-    | SelectGroceryList GroceryList
-    | EditGroceryList GroceryList
-    | DeleteGroceryList GroceryList
-    | SelectMeal Meal
-    | EditMeal Meal
-    | DeleteMeal Meal
+    | AddMeal
+    | SaveGroceryList
+    | SelectGroceryList
+    | EditGroceryList
+    | DeleteGroceryList
+    | SelectMeal
+    | EditMeal
+    | DeleteMeal
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        UserNameInput name ->
-            ( { model | name = name }, Cmd.none )
-
-        SaveUser ->
-            if String.isEmpty model.name then
-                ( model, Cmd.none )
-
-            else
-                ( save model, Cmd.none )
-
         IngredientNameInput ingredient ->
             ( { model | ingredient = ingredient }, Cmd.none )
 
         IngredientAmountInput amount ->
             ( { model | amount = Maybe.withDefault 0 (String.toFloat amount) }, Cmd.none )
 
+        IngredientunitInput unit ->
+            ( { model | unit = unit }, Cmd.none )
+
         AddIngredient ->
-            Debug.log "Ingredient Added"
-                ( { model
-                    | ingredientList = Ingredient model.ingredient model.amount :: model.ingredientList
-                    , ingredient = ""
-                    , amount = 0
-                  }
-                , Cmd.none
-                )
+            ( { model
+                | ingredientList = Ingredient model.ingredient model.amount model.unit :: model.ingredientList
+                , ingredient = ""
+                , amount = 0
+                , unit = ""
+              }
+            , Cmd.none
+            )
+
+        MealNameInput meal ->
+            ( { model | meal = meal }, Cmd.none )
+
+        SaveMeal ->
+            Debug.log "Save meal"
+                ( addMeal model, Cmd.none )
 
         _ ->
             ( model, Cmd.none )
 
 
-save : Model -> Model
-save model =
-    add model
+
+-- add a new meal to the meal list, used by SaveMeal
 
 
-add : Model -> Model
-add model =
+addMeal : Model -> Model
+addMeal model =
     let
-        newUser =
-            User model.name (List.length model.userList) [] []
+        newMeal =
+            Meal model.meal model.ingredientList
 
-        newUserList =
-            newUser :: model.userList
+        newMealList =
+            newMeal :: model.mealList
     in
     { model
-        | userList = newUserList
+        | mealList = newMealList
+        , meal = ""
+        , ingredientList = []
     }
 
 
@@ -163,76 +152,105 @@ view model =
     { title = "Meal to List App"
     , body =
         [ div [] [ h1 [] [ text "Meal to List App" ] ]
-        , if validate model then
-            userHeader model
-
-          else
-            userForm model
         , mealForm model
+        , ingredientSection model
         ]
     }
 
 
-userNames : Model -> List String
-userNames model =
-    List.map (\user -> user.name) model.userList
+
+-- component displaying the list of ingredients and the amounts being added to a new meal
 
 
-validate : Model -> Bool
-validate model =
-    let
-        login =
-            model.name
-
-        isUser =
-            List.filter (\name -> name == login) (userNames model)
-    in
-    if isUser == [] then
-        False
-
-    else
-        True
-
-
-userForm : Model -> Html Msg
-userForm model =
-    Html.form [ onSubmit SaveUser ]
-        [ input
-            [ type_ "text"
-            , placeholder "Add new user"
-            , onInput UserNameInput
-            , value model.name
-            ]
-            []
-        , button [ type_ "submit" ] [ text "Save" ]
-        ]
-
-
-userHeader : Model -> Html Msg
-userHeader model =
+ingredientSection : Model -> Html Msg
+ingredientSection model =
     div []
-        [ header [] [ text model.name ]
-        , button [ type_ "button", onClick Logout ]
-            [ text "Logout" ]
+        [ ingredientListHeader
+        , ingredientList model
         ]
+
+
+ingredientListHeader : Html Msg
+ingredientListHeader =
+    header []
+        [ div
+            []
+            [ h4 [] [ text "Ingredient" ]
+            , h4 [] [ text "Amount" ]
+            , h4 [] [ text "Unit" ]
+            ]
+        ]
+
+
+ingredientList : Model -> Html Msg
+ingredientList model =
+    model.ingredientList
+        |> List.map ingredientMod
+        |> ul []
+
+
+ingredientMod : Ingredient -> Html Msg
+ingredientMod ingredient =
+    li []
+        [ div
+            []
+            [ p [] [ text ingredient.name ]
+            ]
+        , div
+            []
+            [ p [] [ text (String.fromFloat ingredient.amount) ]
+            ]
+        , div
+            []
+            [ p [] [ text ingredient.unit ]
+            ]
+        ]
+
+
+
+-- FORM FOR MAKING A NEW MEAL. INGREDIENT NAME AND AMOUNT IS ADDED TO THE LIST ONE AT A TIME, THEN SAVED AS A MEAL
 
 
 mealForm : Model -> Html Msg
 mealForm model =
-    Html.form [ onSubmit AddIngredient ]
-        [ input
-            [ type_ "text"
-            , placeholder "Add new ingredient"
-            , onInput IngredientNameInput
-            , value model.ingredient
+    div []
+        [ Html.form [ onSubmit AddIngredient ]
+            [ input
+                [ type_ "text"
+                , placeholder "Add new ingredient"
+                , onInput IngredientNameInput
+                , value model.ingredient
+                , selected True
+                ]
+                []
+            , input
+                [ type_ "text"
+                , placeholder "Amount"
+                , onInput IngredientAmountInput
+                , value (String.fromFloat model.amount)
+                ]
+                []
+            , select
+                [ onInput IngredientunitInput
+                , value model.unit
+                ]
+                [ option [] [ text "lbs" ]
+                , option [] [ text "pkg" ]
+                , option [] [ text "qrt" ]
+                , option [] [ text "gal" ]
+                , option [] [ text "pnt" ]
+                , option [] [ text "qty" ]
+                ]
+            , button [ type_ "submit" ] [ text "Add" ]
             ]
-            []
-        , input
-            [ type_ "text"
-            , placeholder "Amount"
-            , onInput IngredientAmountInput
-            , value (String.fromFloat model.amount)
+        , div []
+            [ input
+                [ type_ "text"
+                , placeholder "Meal name"
+                , onInput MealNameInput
+                , value model.meal
+                ]
+                []
+            , button [ type_ "button", onClick SaveMeal ] [ text "Save meal" ]
             ]
-            []
-        , button [ type_ "submit" ] [ text "Add" ]
         ]
