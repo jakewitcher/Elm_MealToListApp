@@ -1,4 +1,4 @@
-module Main exposing (Document, Grocery, Ingredient, Meal, Model, Msg(..), init, main, subscriptions, update, view)
+module Main exposing (Document, Grocery, Item, Meal, Model, Msg(..), createMeal, init, itemList, itemListHeader, itemMod, itemSection, main, mealForm, subscriptions, update, view)
 
 import Browser
 import Html exposing (..)
@@ -21,16 +21,17 @@ main =
 
 type alias Model =
     { meal : String
-    , ingredient : String
+    , item : String
     , amount : Float
     , unit : String
-    , ingredientList : List Ingredient
+    , itemList : List Item
     , mealList : List Meal
-    , groceryList : List Grocery
+    , groceryList : List Item
+    , groceryListAll : List Grocery
     }
 
 
-type alias Ingredient =
+type alias Item =
     { name : String
     , amount : Float
     , unit : String
@@ -39,19 +40,19 @@ type alias Ingredient =
 
 type alias Meal =
     { name : String
-    , ingredientList : List Ingredient
+    , itemList : List Item
     }
 
 
 type alias Grocery =
     { name : String
-    , meals : List Meal
+    , items : List Item
     }
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( { meal = "", ingredient = "", amount = 0, unit = "", ingredientList = [], mealList = [], groceryList = [] }, Cmd.none )
+    ( { meal = "", item = "", amount = 0, unit = "", itemList = [], mealList = [], groceryList = [], groceryListAll = [] }, Cmd.none )
 
 
 
@@ -59,11 +60,11 @@ init _ =
 
 
 type Msg
-    = IngredientNameInput String
-    | IngredientAmountInput String
-    | IngredientunitInput String
+    = ItemInput String
+    | AmountInput String
+    | UnitInput String
     | MealNameInput String
-    | AddIngredient
+    | Additem
     | SaveMeal
     | AddMeal
     | SaveGroceryList
@@ -78,19 +79,19 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        IngredientNameInput ingredient ->
-            ( { model | ingredient = ingredient }, Cmd.none )
+        ItemInput item ->
+            ( { model | item = item }, Cmd.none )
 
-        IngredientAmountInput amount ->
+        AmountInput amount ->
             ( { model | amount = Maybe.withDefault 0 (String.toFloat amount) }, Cmd.none )
 
-        IngredientunitInput unit ->
+        UnitInput unit ->
             ( { model | unit = unit }, Cmd.none )
 
-        AddIngredient ->
+        Additem ->
             ( { model
-                | ingredientList = Ingredient model.ingredient model.amount model.unit :: model.ingredientList
-                , ingredient = ""
+                | itemList = Item model.item model.amount model.unit :: model.itemList
+                , item = ""
                 , amount = 0
                 , unit = ""
               }
@@ -102,21 +103,22 @@ update msg model =
 
         SaveMeal ->
             Debug.log "Save meal"
-                ( addMeal model, Cmd.none )
+                ( createMeal model, Cmd.none )
 
         _ ->
             ( model, Cmd.none )
 
 
 
+-- add list of items from a meal with the required amount to a grocery list
 -- add a new meal to the meal list, used by SaveMeal
 
 
-addMeal : Model -> Model
-addMeal model =
+createMeal : Model -> Model
+createMeal model =
     let
         newMeal =
-            Meal model.meal model.ingredientList
+            Meal model.meal model.itemList
 
         newMealList =
             newMeal :: model.mealList
@@ -124,7 +126,7 @@ addMeal model =
     { model
         | mealList = newMealList
         , meal = ""
-        , ingredientList = []
+        , itemList = []
     }
 
 
@@ -153,97 +155,68 @@ view model =
     , body =
         [ div [] [ h1 [] [ text "Meal to List App" ] ]
         , mealForm model
-        , ingredientSection model
+        , itemSection model
         ]
     }
 
 
 
--- component displaying the list of ingredients and the amounts being added to a new meal
+-- component displaying the list of items and the amounts being added to a new meal
 
 
-ingredientSection : Model -> Html Msg
-ingredientSection model =
+itemSection : Model -> Html Msg
+itemSection model =
     div []
-        [ ingredientListHeader
-        , ingredientList model
+        [ itemListHeader
+        , itemList model
         ]
 
 
-ingredientListHeader : Html Msg
-ingredientListHeader =
+itemListHeader : Html Msg
+itemListHeader =
     header []
         [ div
             []
-            [ h4 [] [ text "Ingredient" ]
+            [ h4 [] [ text "Item" ]
             , h4 [] [ text "Amount" ]
             , h4 [] [ text "Unit" ]
             ]
         ]
 
 
-ingredientList : Model -> Html Msg
-ingredientList model =
-    model.ingredientList
-        |> List.map ingredientMod
+itemList : Model -> Html Msg
+itemList model =
+    model.itemList
+        |> List.map itemMod
         |> ul []
 
 
-ingredientMod : Ingredient -> Html Msg
-ingredientMod ingredient =
+itemMod : Item -> Html Msg
+itemMod item =
     li []
         [ div
             []
-            [ p [] [ text ingredient.name ]
+            [ p [] [ text item.name ]
             ]
         , div
             []
-            [ p [] [ text (String.fromFloat ingredient.amount) ]
+            [ p [] [ text (String.fromFloat item.amount) ]
             ]
         , div
             []
-            [ p [] [ text ingredient.unit ]
+            [ p [] [ text item.unit ]
             ]
         ]
 
 
 
--- FORM FOR MAKING A NEW MEAL. INGREDIENT NAME AND AMOUNT IS ADDED TO THE LIST ONE AT A TIME, THEN SAVED AS A MEAL
+-- Form for making a new meal. item name and amount is added to the list one at a time, then saved as a meal
 
 
 mealForm : Model -> Html Msg
 mealForm model =
     div []
-        [ Html.form [ onSubmit AddIngredient ]
-            [ input
-                [ type_ "text"
-                , placeholder "Add new ingredient"
-                , onInput IngredientNameInput
-                , value model.ingredient
-                , selected True
-                ]
-                []
-            , input
-                [ type_ "text"
-                , placeholder "Amount"
-                , onInput IngredientAmountInput
-                , value (String.fromFloat model.amount)
-                ]
-                []
-            , select
-                [ onInput IngredientunitInput
-                , value model.unit
-                ]
-                [ option [] [ text "lbs" ]
-                , option [] [ text "pkg" ]
-                , option [] [ text "qrt" ]
-                , option [] [ text "gal" ]
-                , option [] [ text "pnt" ]
-                , option [] [ text "qty" ]
-                ]
-            , button [ type_ "submit" ] [ text "Add" ]
-            ]
-        , div []
+        [ div []
             [ input
                 [ type_ "text"
                 , placeholder "Meal name"
@@ -252,5 +225,36 @@ mealForm model =
                 ]
                 []
             , button [ type_ "button", onClick SaveMeal ] [ text "Save meal" ]
+            ]
+        , div []
+            [ Html.form [ onSubmit Additem ]
+                [ input
+                    [ type_ "text"
+                    , placeholder "Add new item"
+                    , onInput ItemInput
+                    , value model.item
+                    , selected True
+                    ]
+                    []
+                , input
+                    [ type_ "text"
+                    , placeholder "Amount"
+                    , onInput AmountInput
+                    , value (String.fromFloat model.amount)
+                    ]
+                    []
+                , select
+                    [ onInput UnitInput
+                    , value model.unit
+                    ]
+                    [ option [] [ text "lbs" ]
+                    , option [] [ text "pkg" ]
+                    , option [] [ text "qrt" ]
+                    , option [] [ text "gal" ]
+                    , option [] [ text "pnt" ]
+                    , option [] [ text "qty" ]
+                    ]
+                , button [ type_ "submit" ] [ text "Add" ]
+                ]
             ]
         ]
