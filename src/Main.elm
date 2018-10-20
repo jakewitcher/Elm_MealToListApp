@@ -24,6 +24,7 @@ type alias Model =
     , item : String
     , amount : Float
     , unit : String
+    , grocery : String
     , itemList : List Item
     , mealList : List Meal
     , groceryList : List Item
@@ -52,7 +53,18 @@ type alias Grocery =
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( { meal = "", item = "", amount = 0, unit = "", itemList = [], mealList = [], groceryList = [], groceryListAll = [] }, Cmd.none )
+    ( { meal = ""
+      , item = ""
+      , amount = 0
+      , unit = ""
+      , grocery = ""
+      , itemList = []
+      , mealList = []
+      , groceryList = []
+      , groceryListAll = []
+      }
+    , Cmd.none
+    )
 
 
 
@@ -60,35 +72,42 @@ init _ =
 
 
 type Msg
-    = ItemInput String
-    | AmountInput String
-    | UnitInput String
-    | MealNameInput String
-    | Additem
-    | SaveMeal
+    = InputItem String
+    | InputAmount String
+    | InputUnit String
+    | InputMeal String
+    | InputGrocery String
+    | AddItem
     | AddMeal
-    | SaveGroceryList
-    | SelectGroceryList
-    | EditGroceryList
-    | DeleteGroceryList
+    | SaveMeal
+    | SaveGrocery
     | SelectMeal
+    | SelectGrocery
     | EditMeal
+    | EditGrocery
     | DeleteMeal
+    | DeleteGrocery
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        ItemInput item ->
+        InputItem item ->
             ( { model | item = item }, Cmd.none )
 
-        AmountInput amount ->
+        InputAmount amount ->
             ( { model | amount = Maybe.withDefault 0 (String.toFloat amount) }, Cmd.none )
 
-        UnitInput unit ->
+        InputUnit unit ->
             ( { model | unit = unit }, Cmd.none )
 
-        Additem ->
+        InputMeal meal ->
+            ( { model | meal = meal }, Cmd.none )
+
+        InputGrocery grocery ->
+            ( { model | grocery = grocery }, Cmd.none )
+
+        AddItem ->
             ( { model
                 | itemList = Item model.item model.amount model.unit :: model.itemList
                 , item = ""
@@ -98,8 +117,8 @@ update msg model =
             , Cmd.none
             )
 
-        MealNameInput meal ->
-            ( { model | meal = meal }, Cmd.none )
+        AddMeal ->
+            ( addItems model, Cmd.none )
 
         SaveMeal ->
             Debug.log "Save meal"
@@ -110,7 +129,28 @@ update msg model =
 
 
 
--- add list of items from a meal with the required amount to a grocery list
+-- add list of items from a meal to a grocery list, increasing the amount if the item already exists in the grocery list
+
+
+findMeal : Model -> List Meal
+findMeal model =
+    List.filter (\meal -> meal.name == model.meal) model.mealList
+
+
+addItems : Model -> Model
+addItems model =
+    let
+        meal =
+            findMeal model
+                |> List.map (\m -> m.itemList)
+                |> List.foldl (++) []
+    in
+    { model
+        | groceryList = meal ++ model.groceryList
+    }
+
+
+
 -- add a new meal to the meal list, used by SaveMeal
 
 
@@ -156,8 +196,56 @@ view model =
         [ div [] [ h1 [] [ text "Meal to List App" ] ]
         , mealForm model
         , itemSection model
+        , groceryForm model
+        , grocerySection model
         ]
     }
+
+
+
+-- component displaying the list of items and the amounts being added to a new grocery list
+
+
+grocerySection : Model -> Html Msg
+grocerySection model =
+    div []
+        [ itemListHeader
+        , groceryList model
+        ]
+
+
+groceryList : Model -> Html Msg
+groceryList model =
+    model.groceryList
+        |> List.map itemMod
+        |> ul []
+
+
+
+-- form for selecting the meals you would like to combine into a single grocery list
+
+
+mealSelect : Model -> List (Html Msg)
+mealSelect model =
+    List.map (\meal -> option [] [ text (.name meal) ]) model.mealList
+
+
+groceryForm : Model -> Html Msg
+groceryForm model =
+    div []
+        [ input
+            [ type_ "text"
+            , placeholder "Grocery list name"
+            , onInput InputGrocery
+            , value model.grocery
+            ]
+            []
+        , button [ type_ "button", onClick SaveGrocery ] [ text "Save grocery list" ]
+        , Html.form [ onSubmit AddMeal ]
+            [ select [ onInput InputMeal, value model.meal ] (mealSelect model)
+            , button [ type_ "submit" ] [ text "Add to grocery list" ]
+            ]
+        ]
 
 
 
@@ -220,18 +308,18 @@ mealForm model =
             [ input
                 [ type_ "text"
                 , placeholder "Meal name"
-                , onInput MealNameInput
+                , onInput InputMeal
                 , value model.meal
                 ]
                 []
             , button [ type_ "button", onClick SaveMeal ] [ text "Save meal" ]
             ]
         , div []
-            [ Html.form [ onSubmit Additem ]
+            [ Html.form [ onSubmit AddItem ]
                 [ input
                     [ type_ "text"
                     , placeholder "Add new item"
-                    , onInput ItemInput
+                    , onInput InputItem
                     , value model.item
                     , selected True
                     ]
@@ -239,12 +327,12 @@ mealForm model =
                 , input
                     [ type_ "text"
                     , placeholder "Amount"
-                    , onInput AmountInput
+                    , onInput InputAmount
                     , value (String.fromFloat model.amount)
                     ]
                     []
                 , select
-                    [ onInput UnitInput
+                    [ onInput InputUnit
                     , value model.unit
                     ]
                     [ option [] [ text "lbs" ]

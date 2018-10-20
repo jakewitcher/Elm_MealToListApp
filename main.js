@@ -4768,7 +4768,7 @@ var elm$core$Platform$Cmd$batch = _Platform_batch;
 var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
 var author$project$Main$init = function (_n0) {
 	return _Utils_Tuple2(
-		{amount: 0, groceryList: _List_Nil, groceryListAll: _List_Nil, item: '', itemList: _List_Nil, meal: '', mealList: _List_Nil, unit: ''},
+		{amount: 0, grocery: '', groceryList: _List_Nil, groceryListAll: _List_Nil, item: '', itemList: _List_Nil, meal: '', mealList: _List_Nil, unit: ''},
 		elm$core$Platform$Cmd$none);
 };
 var elm$core$Platform$Sub$batch = _Platform_batch;
@@ -4780,161 +4780,6 @@ var author$project$Main$Item = F3(
 	function (name, amount, unit) {
 		return {amount: amount, name: name, unit: unit};
 	});
-var author$project$Main$Meal = F2(
-	function (name, itemList) {
-		return {itemList: itemList, name: name};
-	});
-var author$project$Main$createMeal = function (model) {
-	var newMeal = A2(author$project$Main$Meal, model.meal, model.itemList);
-	var newMealList = A2(elm$core$List$cons, newMeal, model.mealList);
-	return _Utils_update(
-		model,
-		{itemList: _List_Nil, meal: '', mealList: newMealList});
-};
-var elm$core$Debug$log = _Debug_log;
-var elm$core$Maybe$withDefault = F2(
-	function (_default, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return value;
-		} else {
-			return _default;
-		}
-	});
-var elm$core$String$toFloat = _String_toFloat;
-var author$project$Main$update = F2(
-	function (msg, model) {
-		switch (msg.$) {
-			case 'ItemInput':
-				var item = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{item: item}),
-					elm$core$Platform$Cmd$none);
-			case 'AmountInput':
-				var amount = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							amount: A2(
-								elm$core$Maybe$withDefault,
-								0,
-								elm$core$String$toFloat(amount))
-						}),
-					elm$core$Platform$Cmd$none);
-			case 'UnitInput':
-				var unit = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{unit: unit}),
-					elm$core$Platform$Cmd$none);
-			case 'Additem':
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							amount: 0,
-							item: '',
-							itemList: A2(
-								elm$core$List$cons,
-								A3(author$project$Main$Item, model.item, model.amount, model.unit),
-								model.itemList),
-							unit: ''
-						}),
-					elm$core$Platform$Cmd$none);
-			case 'MealNameInput':
-				var meal = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{meal: meal}),
-					elm$core$Platform$Cmd$none);
-			case 'SaveMeal':
-				return A2(
-					elm$core$Debug$log,
-					'Save meal',
-					_Utils_Tuple2(
-						author$project$Main$createMeal(model),
-						elm$core$Platform$Cmd$none));
-			default:
-				return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
-		}
-	});
-var elm$core$String$fromFloat = _String_fromNumber;
-var elm$core$Basics$identity = function (x) {
-	return x;
-};
-var elm$json$Json$Decode$map = _Json_map1;
-var elm$json$Json$Decode$map2 = _Json_map2;
-var elm$json$Json$Decode$succeed = _Json_succeed;
-var elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
-	switch (handler.$) {
-		case 'Normal':
-			return 0;
-		case 'MayStopPropagation':
-			return 1;
-		case 'MayPreventDefault':
-			return 2;
-		default:
-			return 3;
-	}
-};
-var elm$html$Html$div = _VirtualDom_node('div');
-var elm$html$Html$li = _VirtualDom_node('li');
-var elm$html$Html$p = _VirtualDom_node('p');
-var elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var elm$html$Html$text = elm$virtual_dom$VirtualDom$text;
-var author$project$Main$itemMod = function (item) {
-	return A2(
-		elm$html$Html$li,
-		_List_Nil,
-		_List_fromArray(
-			[
-				A2(
-				elm$html$Html$div,
-				_List_Nil,
-				_List_fromArray(
-					[
-						A2(
-						elm$html$Html$p,
-						_List_Nil,
-						_List_fromArray(
-							[
-								elm$html$Html$text(item.name)
-							]))
-					])),
-				A2(
-				elm$html$Html$div,
-				_List_Nil,
-				_List_fromArray(
-					[
-						A2(
-						elm$html$Html$p,
-						_List_Nil,
-						_List_fromArray(
-							[
-								elm$html$Html$text(
-								elm$core$String$fromFloat(item.amount))
-							]))
-					])),
-				A2(
-				elm$html$Html$div,
-				_List_Nil,
-				_List_fromArray(
-					[
-						A2(
-						elm$html$Html$p,
-						_List_Nil,
-						_List_fromArray(
-							[
-								elm$html$Html$text(item.unit)
-							]))
-					]))
-			]));
-};
 var elm$core$List$foldrHelper = F4(
 	function (fn, acc, ctr, ls) {
 		if (!ls.b) {
@@ -4990,6 +4835,25 @@ var elm$core$List$foldr = F3(
 	function (fn, acc, ls) {
 		return A4(elm$core$List$foldrHelper, fn, acc, 0, ls);
 	});
+var elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2(elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var author$project$Main$findMeal = function (model) {
+	return A2(
+		elm$core$List$filter,
+		function (meal) {
+			return _Utils_eq(meal.name, model.meal);
+		},
+		model.mealList);
+};
 var elm$core$List$map = F2(
 	function (f, xs) {
 		return A3(
@@ -5004,76 +4868,167 @@ var elm$core$List$map = F2(
 			_List_Nil,
 			xs);
 	});
-var elm$html$Html$ul = _VirtualDom_node('ul');
-var author$project$Main$itemList = function (model) {
-	return A2(
-		elm$html$Html$ul,
+var author$project$Main$addItems = function (model) {
+	var meal = A3(
+		elm$core$List$foldl,
+		elm$core$Basics$append,
 		_List_Nil,
-		A2(elm$core$List$map, author$project$Main$itemMod, model.itemList));
+		A2(
+			elm$core$List$map,
+			function (m) {
+				return m.itemList;
+			},
+			author$project$Main$findMeal(model)));
+	return _Utils_update(
+		model,
+		{
+			groceryList: _Utils_ap(meal, model.groceryList)
+		});
 };
-var elm$html$Html$h4 = _VirtualDom_node('h4');
-var elm$html$Html$header = _VirtualDom_node('header');
-var author$project$Main$itemListHeader = A2(
-	elm$html$Html$header,
-	_List_Nil,
-	_List_fromArray(
-		[
-			A2(
-			elm$html$Html$div,
-			_List_Nil,
-			_List_fromArray(
-				[
-					A2(
-					elm$html$Html$h4,
-					_List_Nil,
-					_List_fromArray(
-						[
-							elm$html$Html$text('Item')
-						])),
-					A2(
-					elm$html$Html$h4,
-					_List_Nil,
-					_List_fromArray(
-						[
-							elm$html$Html$text('Amount')
-						])),
-					A2(
-					elm$html$Html$h4,
-					_List_Nil,
-					_List_fromArray(
-						[
-							elm$html$Html$text('Unit')
-						]))
-				]))
-		]));
-var author$project$Main$itemSection = function (model) {
+var author$project$Main$Meal = F2(
+	function (name, itemList) {
+		return {itemList: itemList, name: name};
+	});
+var author$project$Main$createMeal = function (model) {
+	var newMeal = A2(author$project$Main$Meal, model.meal, model.itemList);
+	var newMealList = A2(elm$core$List$cons, newMeal, model.mealList);
+	return _Utils_update(
+		model,
+		{itemList: _List_Nil, meal: '', mealList: newMealList});
+};
+var elm$core$Debug$log = _Debug_log;
+var elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
+var elm$core$String$toFloat = _String_toFloat;
+var author$project$Main$update = F2(
+	function (msg, model) {
+		switch (msg.$) {
+			case 'InputItem':
+				var item = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{item: item}),
+					elm$core$Platform$Cmd$none);
+			case 'InputAmount':
+				var amount = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							amount: A2(
+								elm$core$Maybe$withDefault,
+								0,
+								elm$core$String$toFloat(amount))
+						}),
+					elm$core$Platform$Cmd$none);
+			case 'InputUnit':
+				var unit = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{unit: unit}),
+					elm$core$Platform$Cmd$none);
+			case 'InputMeal':
+				var meal = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{meal: meal}),
+					elm$core$Platform$Cmd$none);
+			case 'InputGrocery':
+				var grocery = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{grocery: grocery}),
+					elm$core$Platform$Cmd$none);
+			case 'AddItem':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							amount: 0,
+							item: '',
+							itemList: A2(
+								elm$core$List$cons,
+								A3(author$project$Main$Item, model.item, model.amount, model.unit),
+								model.itemList),
+							unit: ''
+						}),
+					elm$core$Platform$Cmd$none);
+			case 'AddMeal':
+				return _Utils_Tuple2(
+					author$project$Main$addItems(model),
+					elm$core$Platform$Cmd$none);
+			case 'SaveMeal':
+				return A2(
+					elm$core$Debug$log,
+					'Save meal',
+					_Utils_Tuple2(
+						author$project$Main$createMeal(model),
+						elm$core$Platform$Cmd$none));
+			default:
+				return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+		}
+	});
+var author$project$Main$AddMeal = {$: 'AddMeal'};
+var author$project$Main$InputGrocery = function (a) {
+	return {$: 'InputGrocery', a: a};
+};
+var author$project$Main$InputMeal = function (a) {
+	return {$: 'InputMeal', a: a};
+};
+var author$project$Main$SaveGrocery = {$: 'SaveGrocery'};
+var elm$core$Basics$identity = function (x) {
+	return x;
+};
+var elm$json$Json$Decode$map = _Json_map1;
+var elm$json$Json$Decode$map2 = _Json_map2;
+var elm$json$Json$Decode$succeed = _Json_succeed;
+var elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
+	switch (handler.$) {
+		case 'Normal':
+			return 0;
+		case 'MayStopPropagation':
+			return 1;
+		case 'MayPreventDefault':
+			return 2;
+		default:
+			return 3;
+	}
+};
+var elm$html$Html$option = _VirtualDom_node('option');
+var elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var elm$html$Html$text = elm$virtual_dom$VirtualDom$text;
+var author$project$Main$mealSelect = function (model) {
 	return A2(
-		elm$html$Html$div,
-		_List_Nil,
-		_List_fromArray(
-			[
-				author$project$Main$itemListHeader,
-				author$project$Main$itemList(model)
-			]));
-};
-var author$project$Main$Additem = {$: 'Additem'};
-var author$project$Main$AmountInput = function (a) {
-	return {$: 'AmountInput', a: a};
-};
-var author$project$Main$ItemInput = function (a) {
-	return {$: 'ItemInput', a: a};
-};
-var author$project$Main$MealNameInput = function (a) {
-	return {$: 'MealNameInput', a: a};
-};
-var author$project$Main$SaveMeal = {$: 'SaveMeal'};
-var author$project$Main$UnitInput = function (a) {
-	return {$: 'UnitInput', a: a};
+		elm$core$List$map,
+		function (meal) {
+			return A2(
+				elm$html$Html$option,
+				_List_Nil,
+				_List_fromArray(
+					[
+						elm$html$Html$text(
+						function ($) {
+							return $.name;
+						}(meal))
+					]));
+		},
+		model.mealList);
 };
 var elm$html$Html$button = _VirtualDom_node('button');
+var elm$html$Html$div = _VirtualDom_node('div');
 var elm$html$Html$form = _VirtualDom_node('form');
 var elm$html$Html$input = _VirtualDom_node('input');
-var elm$html$Html$option = _VirtualDom_node('option');
 var elm$html$Html$select = _VirtualDom_node('select');
 var elm$json$Json$Encode$string = _Json_wrap;
 var elm$html$Html$Attributes$stringProperty = F2(
@@ -5084,15 +5039,6 @@ var elm$html$Html$Attributes$stringProperty = F2(
 			elm$json$Json$Encode$string(string));
 	});
 var elm$html$Html$Attributes$placeholder = elm$html$Html$Attributes$stringProperty('placeholder');
-var elm$json$Json$Encode$bool = _Json_wrap;
-var elm$html$Html$Attributes$boolProperty = F2(
-	function (key, bool) {
-		return A2(
-			_VirtualDom_property,
-			key,
-			elm$json$Json$Encode$bool(bool));
-	});
-var elm$html$Html$Attributes$selected = elm$html$Html$Attributes$boolProperty('selected');
 var elm$html$Html$Attributes$type_ = elm$html$Html$Attributes$stringProperty('type');
 var elm$html$Html$Attributes$value = elm$html$Html$Attributes$stringProperty('value');
 var elm$virtual_dom$VirtualDom$Normal = function (a) {
@@ -5167,6 +5113,201 @@ var elm$html$Html$Events$onSubmit = function (msg) {
 			elm$html$Html$Events$alwaysPreventDefault,
 			elm$json$Json$Decode$succeed(msg)));
 };
+var author$project$Main$groceryForm = function (model) {
+	return A2(
+		elm$html$Html$div,
+		_List_Nil,
+		_List_fromArray(
+			[
+				A2(
+				elm$html$Html$input,
+				_List_fromArray(
+					[
+						elm$html$Html$Attributes$type_('text'),
+						elm$html$Html$Attributes$placeholder('Grocery list name'),
+						elm$html$Html$Events$onInput(author$project$Main$InputGrocery),
+						elm$html$Html$Attributes$value(model.grocery)
+					]),
+				_List_Nil),
+				A2(
+				elm$html$Html$button,
+				_List_fromArray(
+					[
+						elm$html$Html$Attributes$type_('button'),
+						elm$html$Html$Events$onClick(author$project$Main$SaveGrocery)
+					]),
+				_List_fromArray(
+					[
+						elm$html$Html$text('Save grocery list')
+					])),
+				A2(
+				elm$html$Html$form,
+				_List_fromArray(
+					[
+						elm$html$Html$Events$onSubmit(author$project$Main$AddMeal)
+					]),
+				_List_fromArray(
+					[
+						A2(
+						elm$html$Html$select,
+						_List_fromArray(
+							[
+								elm$html$Html$Events$onInput(author$project$Main$InputMeal),
+								elm$html$Html$Attributes$value(model.meal)
+							]),
+						author$project$Main$mealSelect(model)),
+						A2(
+						elm$html$Html$button,
+						_List_fromArray(
+							[
+								elm$html$Html$Attributes$type_('submit')
+							]),
+						_List_fromArray(
+							[
+								elm$html$Html$text('Add to grocery list')
+							]))
+					]))
+			]));
+};
+var elm$core$String$fromFloat = _String_fromNumber;
+var elm$html$Html$li = _VirtualDom_node('li');
+var elm$html$Html$p = _VirtualDom_node('p');
+var author$project$Main$itemMod = function (item) {
+	return A2(
+		elm$html$Html$li,
+		_List_Nil,
+		_List_fromArray(
+			[
+				A2(
+				elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						elm$html$Html$p,
+						_List_Nil,
+						_List_fromArray(
+							[
+								elm$html$Html$text(item.name)
+							]))
+					])),
+				A2(
+				elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						elm$html$Html$p,
+						_List_Nil,
+						_List_fromArray(
+							[
+								elm$html$Html$text(
+								elm$core$String$fromFloat(item.amount))
+							]))
+					])),
+				A2(
+				elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						elm$html$Html$p,
+						_List_Nil,
+						_List_fromArray(
+							[
+								elm$html$Html$text(item.unit)
+							]))
+					]))
+			]));
+};
+var elm$html$Html$ul = _VirtualDom_node('ul');
+var author$project$Main$groceryList = function (model) {
+	return A2(
+		elm$html$Html$ul,
+		_List_Nil,
+		A2(elm$core$List$map, author$project$Main$itemMod, model.groceryList));
+};
+var elm$html$Html$h4 = _VirtualDom_node('h4');
+var elm$html$Html$header = _VirtualDom_node('header');
+var author$project$Main$itemListHeader = A2(
+	elm$html$Html$header,
+	_List_Nil,
+	_List_fromArray(
+		[
+			A2(
+			elm$html$Html$div,
+			_List_Nil,
+			_List_fromArray(
+				[
+					A2(
+					elm$html$Html$h4,
+					_List_Nil,
+					_List_fromArray(
+						[
+							elm$html$Html$text('Item')
+						])),
+					A2(
+					elm$html$Html$h4,
+					_List_Nil,
+					_List_fromArray(
+						[
+							elm$html$Html$text('Amount')
+						])),
+					A2(
+					elm$html$Html$h4,
+					_List_Nil,
+					_List_fromArray(
+						[
+							elm$html$Html$text('Unit')
+						]))
+				]))
+		]));
+var author$project$Main$grocerySection = function (model) {
+	return A2(
+		elm$html$Html$div,
+		_List_Nil,
+		_List_fromArray(
+			[
+				author$project$Main$itemListHeader,
+				author$project$Main$groceryList(model)
+			]));
+};
+var author$project$Main$itemList = function (model) {
+	return A2(
+		elm$html$Html$ul,
+		_List_Nil,
+		A2(elm$core$List$map, author$project$Main$itemMod, model.itemList));
+};
+var author$project$Main$itemSection = function (model) {
+	return A2(
+		elm$html$Html$div,
+		_List_Nil,
+		_List_fromArray(
+			[
+				author$project$Main$itemListHeader,
+				author$project$Main$itemList(model)
+			]));
+};
+var author$project$Main$AddItem = {$: 'AddItem'};
+var author$project$Main$InputAmount = function (a) {
+	return {$: 'InputAmount', a: a};
+};
+var author$project$Main$InputItem = function (a) {
+	return {$: 'InputItem', a: a};
+};
+var author$project$Main$InputUnit = function (a) {
+	return {$: 'InputUnit', a: a};
+};
+var author$project$Main$SaveMeal = {$: 'SaveMeal'};
+var elm$json$Json$Encode$bool = _Json_wrap;
+var elm$html$Html$Attributes$boolProperty = F2(
+	function (key, bool) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			elm$json$Json$Encode$bool(bool));
+	});
+var elm$html$Html$Attributes$selected = elm$html$Html$Attributes$boolProperty('selected');
 var author$project$Main$mealForm = function (model) {
 	return A2(
 		elm$html$Html$div,
@@ -5184,7 +5325,7 @@ var author$project$Main$mealForm = function (model) {
 							[
 								elm$html$Html$Attributes$type_('text'),
 								elm$html$Html$Attributes$placeholder('Meal name'),
-								elm$html$Html$Events$onInput(author$project$Main$MealNameInput),
+								elm$html$Html$Events$onInput(author$project$Main$InputMeal),
 								elm$html$Html$Attributes$value(model.meal)
 							]),
 						_List_Nil),
@@ -5209,7 +5350,7 @@ var author$project$Main$mealForm = function (model) {
 						elm$html$Html$form,
 						_List_fromArray(
 							[
-								elm$html$Html$Events$onSubmit(author$project$Main$Additem)
+								elm$html$Html$Events$onSubmit(author$project$Main$AddItem)
 							]),
 						_List_fromArray(
 							[
@@ -5219,7 +5360,7 @@ var author$project$Main$mealForm = function (model) {
 									[
 										elm$html$Html$Attributes$type_('text'),
 										elm$html$Html$Attributes$placeholder('Add new item'),
-										elm$html$Html$Events$onInput(author$project$Main$ItemInput),
+										elm$html$Html$Events$onInput(author$project$Main$InputItem),
 										elm$html$Html$Attributes$value(model.item),
 										elm$html$Html$Attributes$selected(true)
 									]),
@@ -5230,7 +5371,7 @@ var author$project$Main$mealForm = function (model) {
 									[
 										elm$html$Html$Attributes$type_('text'),
 										elm$html$Html$Attributes$placeholder('Amount'),
-										elm$html$Html$Events$onInput(author$project$Main$AmountInput),
+										elm$html$Html$Events$onInput(author$project$Main$InputAmount),
 										elm$html$Html$Attributes$value(
 										elm$core$String$fromFloat(model.amount))
 									]),
@@ -5239,7 +5380,7 @@ var author$project$Main$mealForm = function (model) {
 								elm$html$Html$select,
 								_List_fromArray(
 									[
-										elm$html$Html$Events$onInput(author$project$Main$UnitInput),
+										elm$html$Html$Events$onInput(author$project$Main$InputUnit),
 										elm$html$Html$Attributes$value(model.unit)
 									]),
 								_List_fromArray(
@@ -5320,7 +5461,9 @@ var author$project$Main$view = function (model) {
 							]))
 					])),
 				author$project$Main$mealForm(model),
-				author$project$Main$itemSection(model)
+				author$project$Main$itemSection(model),
+				author$project$Main$groceryForm(model),
+				author$project$Main$grocerySection(model)
 			]),
 		title: 'Meal to List App'
 	};
