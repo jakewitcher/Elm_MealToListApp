@@ -3,10 +3,21 @@ body {
     background-color: #e8e4de
 }
 
-.title {
+.page-header {
     display: flex;
-    justify-content: center;
-    background-color: #e5c28e
+    background-color: #dbb67f;
+    color: #f7f4ef;
+    font-size: 2.5em;
+    padding: 0 10% 0 5%;
+    border: solid 1px #7a5a2c;
+}
+
+#title {
+    box-shadow: 0 0 5px #7a5a2c;
+    background-color: #edcea1;
+    padding: 2% 5% 3% 5%;
+    font-family: 'Playfair Display', serif;
+    text-shadow: 0 0 3px #7a5a2c;
 }
 
 .header {
@@ -20,3 +31,6 @@ body {
     justify-content: center;
     background-color: #f7f4ef
 }
+
+
+/* #e5c28e; */

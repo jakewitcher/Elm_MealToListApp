@@ -5459,6 +5459,7 @@ var author$project$Main$mealForm = function (model) {
 			]));
 };
 var elm$html$Html$h1 = _VirtualDom_node('h1');
+var elm$html$Html$Attributes$id = elm$html$Html$Attributes$stringProperty('id');
 var author$project$Main$view = function (model) {
 	return {
 		body: _List_fromArray(
@@ -5467,13 +5468,16 @@ var author$project$Main$view = function (model) {
 				elm$html$Html$div,
 				_List_fromArray(
 					[
-						elm$html$Html$Attributes$class('title')
+						elm$html$Html$Attributes$class('page-header')
 					]),
 				_List_fromArray(
 					[
 						A2(
 						elm$html$Html$h1,
-						_List_Nil,
+						_List_fromArray(
+							[
+								elm$html$Html$Attributes$id('title')
+							]),
 						_List_fromArray(
 							[
 								elm$html$Html$text('Meal to List App')

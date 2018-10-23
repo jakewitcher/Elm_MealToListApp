@@ -193,7 +193,7 @@ view : Model -> Document Msg
 view model =
     { title = "Meal to List App"
     , body =
-        [ div [ class "title" ] [ h1 [] [ text "Meal to List App" ] ]
+        [ div [ class "page-header" ] [ h1 [ id "title" ] [ text "Meal to List App" ] ]
         , mealForm model
         , itemSection model
         , groceryForm model
