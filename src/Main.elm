@@ -193,7 +193,7 @@ view : Model -> Document Msg
 view model =
     { title = "Meal to List App"
     , body =
-        [ div [] [ h1 [] [ text "Meal to List App" ] ]
+        [ div [ class "title" ] [ h1 [] [ text "Meal to List App" ] ]
         , mealForm model
         , itemSection model
         , groceryForm model
@@ -232,7 +232,7 @@ mealSelect model =
 
 groceryForm : Model -> Html Msg
 groceryForm model =
-    div []
+    div [ class "component" ]
         [ input
             [ type_ "text"
             , placeholder "Grocery list name"
@@ -264,7 +264,7 @@ itemListHeader : Html Msg
 itemListHeader =
     header []
         [ div
-            []
+            [ class "header" ]
             [ h4 [] [ text "Item" ]
             , h4 [] [ text "Amount" ]
             , h4 [] [ text "Unit" ]
@@ -281,7 +281,7 @@ itemList model =
 
 itemMod : Item -> Html Msg
 itemMod item =
-    li []
+    li [ class "header" ]
         [ div
             []
             [ p [] [ text item.name ]
@@ -304,7 +304,7 @@ itemMod item =
 mealForm : Model -> Html Msg
 mealForm model =
     div []
-        [ div []
+        [ div [ class "component" ]
             [ input
                 [ type_ "text"
                 , placeholder "Meal name"
@@ -314,7 +314,7 @@ mealForm model =
                 []
             , button [ type_ "button", onClick SaveMeal ] [ text "Save meal" ]
             ]
-        , div []
+        , div [ class "component" ]
             [ Html.form [ onSubmit AddItem ]
                 [ input
                     [ type_ "text"

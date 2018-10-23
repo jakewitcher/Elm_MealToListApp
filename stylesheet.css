@@ -1,0 +1,22 @@
+body {
+    margin: 0 20% 0 20%;
+    background-color: #e8e4de
+}
+
+.title {
+    display: flex;
+    justify-content: center;
+    background-color: #e5c28e
+}
+
+.header {
+    display: flex;
+    justify-content: space-around;
+    background-color: #f7f4ef
+}
+
+.component {
+    display: flex;
+    justify-content: center;
+    background-color: #f7f4ef
+}
