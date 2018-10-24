@@ -1,6 +1,7 @@
 module Main exposing (Document, Grocery, Item, Meal, Model, Msg(..), createMeal, init, itemList, itemListHeader, itemMod, itemSection, main, mealForm, subscriptions, update, view)
 
 import Browser
+import Dict exposing (Dict)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -214,9 +215,35 @@ grocerySection model =
         ]
 
 
+convertToDictAndSumAmount : List Item -> Dict String Item
+convertToDictAndSumAmount meals =
+    let
+        newDict : Dict String Item
+        newDict =
+            Dict.empty
+    in
+    List.foldl
+        (\item dict ->
+            let
+                itemKey =
+                    .name item
+            in
+            if Dict.member itemKey dict then
+                Dict.update itemKey (Maybe.map (\record -> { record | amount = record.amount + item.amount })) dict
+
+            else
+                Dict.insert itemKey item dict
+        )
+        newDict
+        meals
+
+
 groceryList : Model -> Html Msg
 groceryList model =
     model.groceryList
+        |> List.sortBy .name
+        |> convertToDictAndSumAmount
+        |> Dict.values
         |> List.map itemMod
         |> ul []
 
