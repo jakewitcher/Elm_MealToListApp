@@ -5119,60 +5119,99 @@ var author$project$Main$groceryForm = function (model) {
 		elm$html$Html$div,
 		_List_fromArray(
 			[
-				elm$html$Html$Attributes$class('component')
+				elm$html$Html$Attributes$class('form-component')
 			]),
 		_List_fromArray(
 			[
 				A2(
-				elm$html$Html$input,
+				elm$html$Html$div,
 				_List_fromArray(
 					[
-						elm$html$Html$Attributes$type_('text'),
-						elm$html$Html$Attributes$placeholder('Grocery list name'),
-						elm$html$Html$Events$onInput(author$project$Main$InputGrocery),
-						elm$html$Html$Attributes$value(model.grocery)
-					]),
-				_List_Nil),
-				A2(
-				elm$html$Html$button,
-				_List_fromArray(
-					[
-						elm$html$Html$Attributes$type_('button'),
-						elm$html$Html$Events$onClick(author$project$Main$SaveGrocery)
-					]),
-				_List_fromArray(
-					[
-						elm$html$Html$text('Save grocery list')
-					])),
-				A2(
-				elm$html$Html$form,
-				_List_fromArray(
-					[
-						elm$html$Html$Events$onSubmit(author$project$Main$AddMeal)
+						elm$html$Html$Attributes$class('form-name-box')
 					]),
 				_List_fromArray(
 					[
 						A2(
-						elm$html$Html$select,
+						elm$html$Html$input,
 						_List_fromArray(
 							[
-								elm$html$Html$Events$onInput(author$project$Main$InputMeal),
-								elm$html$Html$Attributes$value(model.meal)
+								elm$html$Html$Attributes$type_('text'),
+								elm$html$Html$Attributes$class('form-input'),
+								elm$html$Html$Attributes$placeholder('Grocery list name'),
+								elm$html$Html$Events$onInput(author$project$Main$InputGrocery),
+								elm$html$Html$Attributes$value(model.grocery)
 							]),
-						author$project$Main$mealSelect(model)),
+						_List_Nil),
 						A2(
 						elm$html$Html$button,
 						_List_fromArray(
 							[
-								elm$html$Html$Attributes$type_('submit')
+								elm$html$Html$Attributes$type_('button'),
+								elm$html$Html$Attributes$class('form-button'),
+								elm$html$Html$Events$onClick(author$project$Main$SaveGrocery)
 							]),
 						_List_fromArray(
 							[
-								elm$html$Html$text('Add to grocery list')
+								elm$html$Html$text('Save grocery list')
+							]))
+					])),
+				A2(
+				elm$html$Html$div,
+				_List_fromArray(
+					[
+						elm$html$Html$Attributes$class('form-item-box')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						elm$html$Html$form,
+						_List_fromArray(
+							[
+								elm$html$Html$Events$onSubmit(author$project$Main$AddMeal)
+							]),
+						_List_fromArray(
+							[
+								A2(
+								elm$html$Html$select,
+								_List_fromArray(
+									[
+										elm$html$Html$Events$onInput(author$project$Main$InputMeal),
+										elm$html$Html$Attributes$class('form-input'),
+										elm$html$Html$Attributes$value(model.meal)
+									]),
+								author$project$Main$mealSelect(model)),
+								A2(
+								elm$html$Html$button,
+								_List_fromArray(
+									[
+										elm$html$Html$Attributes$type_('submit'),
+										elm$html$Html$Attributes$class('form-button')
+									]),
+								_List_fromArray(
+									[
+										elm$html$Html$text('Add to grocery list')
+									]))
 							]))
 					]))
 			]));
 };
+var elm$html$Html$h2 = _VirtualDom_node('h2');
+var author$project$Main$groceryFormHeader = A2(
+	elm$html$Html$div,
+	_List_fromArray(
+		[
+			elm$html$Html$Attributes$class('component-header')
+		]),
+	_List_fromArray(
+		[
+			A2(
+			elm$html$Html$h2,
+			_List_Nil,
+			_List_fromArray(
+				[
+					elm$html$Html$text('Create a new grocery list')
+				]))
+		]));
 var elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
 var elm$core$Dict$empty = elm$core$Dict$RBEmpty_elm_builtin;
 var elm$core$Dict$Black = {$: 'Black'};
@@ -5899,14 +5938,17 @@ var elm$html$Html$Attributes$selected = elm$html$Html$Attributes$boolProperty('s
 var author$project$Main$mealForm = function (model) {
 	return A2(
 		elm$html$Html$div,
-		_List_Nil,
+		_List_fromArray(
+			[
+				elm$html$Html$Attributes$class('form-component')
+			]),
 		_List_fromArray(
 			[
 				A2(
 				elm$html$Html$div,
 				_List_fromArray(
 					[
-						elm$html$Html$Attributes$class('component')
+						elm$html$Html$Attributes$class('form-name-box')
 					]),
 				_List_fromArray(
 					[
@@ -5914,6 +5956,7 @@ var author$project$Main$mealForm = function (model) {
 						elm$html$Html$input,
 						_List_fromArray(
 							[
+								elm$html$Html$Attributes$class('form-input'),
 								elm$html$Html$Attributes$type_('text'),
 								elm$html$Html$Attributes$placeholder('Meal name'),
 								elm$html$Html$Events$onInput(author$project$Main$InputMeal),
@@ -5925,6 +5968,7 @@ var author$project$Main$mealForm = function (model) {
 						_List_fromArray(
 							[
 								elm$html$Html$Attributes$type_('button'),
+								elm$html$Html$Attributes$class('form-button'),
 								elm$html$Html$Events$onClick(author$project$Main$SaveMeal)
 							]),
 						_List_fromArray(
@@ -5936,7 +5980,7 @@ var author$project$Main$mealForm = function (model) {
 				elm$html$Html$div,
 				_List_fromArray(
 					[
-						elm$html$Html$Attributes$class('component')
+						elm$html$Html$Attributes$class('form-item-box')
 					]),
 				_List_fromArray(
 					[
@@ -5952,6 +5996,7 @@ var author$project$Main$mealForm = function (model) {
 								elm$html$Html$input,
 								_List_fromArray(
 									[
+										elm$html$Html$Attributes$class('form-input'),
 										elm$html$Html$Attributes$type_('text'),
 										elm$html$Html$Attributes$placeholder('Add new item'),
 										elm$html$Html$Events$onInput(author$project$Main$InputItem),
@@ -5963,6 +6008,7 @@ var author$project$Main$mealForm = function (model) {
 								elm$html$Html$input,
 								_List_fromArray(
 									[
+										elm$html$Html$Attributes$class('form-input'),
 										elm$html$Html$Attributes$type_('text'),
 										elm$html$Html$Attributes$placeholder('Amount'),
 										elm$html$Html$Events$onInput(author$project$Main$InputAmount),
@@ -5974,6 +6020,7 @@ var author$project$Main$mealForm = function (model) {
 								elm$html$Html$select,
 								_List_fromArray(
 									[
+										elm$html$Html$Attributes$class('form-input'),
 										elm$html$Html$Events$onInput(author$project$Main$InputUnit),
 										elm$html$Html$Attributes$value(model.unit)
 									]),
@@ -6026,7 +6073,8 @@ var author$project$Main$mealForm = function (model) {
 								elm$html$Html$button,
 								_List_fromArray(
 									[
-										elm$html$Html$Attributes$type_('submit')
+										elm$html$Html$Attributes$type_('submit'),
+										elm$html$Html$Attributes$class('form-button')
 									]),
 								_List_fromArray(
 									[
@@ -6036,6 +6084,22 @@ var author$project$Main$mealForm = function (model) {
 					]))
 			]));
 };
+var author$project$Main$mealFormHeader = A2(
+	elm$html$Html$div,
+	_List_fromArray(
+		[
+			elm$html$Html$Attributes$class('component-header')
+		]),
+	_List_fromArray(
+		[
+			A2(
+			elm$html$Html$h2,
+			_List_Nil,
+			_List_fromArray(
+				[
+					elm$html$Html$text('Create a new meal')
+				]))
+		]));
 var elm$html$Html$h1 = _VirtualDom_node('h1');
 var elm$html$Html$Attributes$id = elm$html$Html$Attributes$stringProperty('id');
 var author$project$Main$view = function (model) {
@@ -6061,8 +6125,24 @@ var author$project$Main$view = function (model) {
 								elm$html$Html$text('Meal to List App')
 							]))
 					])),
+				A2(
+				elm$html$Html$div,
+				_List_fromArray(
+					[
+						elm$html$Html$Attributes$class('header-break')
+					]),
+				_List_Nil),
+				author$project$Main$mealFormHeader,
 				author$project$Main$mealForm(model),
 				author$project$Main$itemSection(model),
+				A2(
+				elm$html$Html$div,
+				_List_fromArray(
+					[
+						elm$html$Html$Attributes$class('header-break')
+					]),
+				_List_Nil),
+				author$project$Main$groceryFormHeader,
 				author$project$Main$groceryForm(model),
 				author$project$Main$grocerySection(model)
 			]),

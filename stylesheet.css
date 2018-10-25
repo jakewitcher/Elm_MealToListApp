@@ -20,10 +20,77 @@ body {
     text-shadow: 0 0 3px #7a5a2c;
 }
 
-.header {
+.header-break {
+    float: left;
+    background-color: #9dbdc4;
+    height: 10px;
+    width: 100%;
+    border-left: solid 1px #7a5a2c;
+    border-right: solid 1px #7a5a2c;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box
+}
+
+.component-header {
     display: flex;
-    justify-content: space-around;
-    background-color: #f7f4ef
+    padding: 0 5% 0 5%;
+    background-color: #f7f4ef;
+    font-family: 'Playfair Display', serif;
+    font-style: bold;
+    text-shadow: 0 0 3px #edcea1;
+    color: #7a5a2c;
+    font-size: 1.5em;
+    border-left: solid 1px #7a5a2c;
+    border-right: solid 1px #7a5a2c;
+    border-top: solid 1px #7a5a2c;
+    border-bottom: solid 3px #7a5a2c
+}
+
+.form-component {
+    background-color: #9dbdc4;
+    border-left: solid 1px #7a5a2c;
+    border-right: solid 1px #7a5a2c;
+    padding-top: 3%;
+}
+
+.form-name-box {
+    display: flex;
+    justify-content: flex-end;
+    margin-right: 27.8%;
+    height: 35px
+}
+
+.form-item-box {
+    display: flex;
+    justify-content: flex-end;
+    padding: 3%;
+    margin-right: 8.5%;
+    height: 35px
+}
+
+.form-input {
+    border: solid 1px #7a5a2c;
+    padding: 1%;
+    margin-right: 2%;
+    border-radius: 3px;
+    font-family: 'Open Sans', sans-serif
+}
+
+.form-input:focus {
+    border: solid 1px #467077;
+    box-shadow: 0 0 5px #6196a0;
+    padding: 1%
+}
+
+.form-button {
+    border: solid 1px #7a5a2c;
+    padding: 1%;
+    margin-right: 2%;
+    background-color: #dbb67f;
+    color: #f7f4ef;
+    border-radius: 3px;
+    font-family: 'Open Sans', sans-serif
 }
 
 .component {

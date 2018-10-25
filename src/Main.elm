@@ -195,8 +195,12 @@ view model =
     { title = "Meal to List App"
     , body =
         [ div [ class "page-header" ] [ h1 [ id "title" ] [ text "Meal to List App" ] ]
+        , div [ class "header-break" ] []
+        , mealFormHeader
         , mealForm model
         , itemSection model
+        , div [ class "header-break" ] []
+        , groceryFormHeader
         , groceryForm model
         , grocerySection model
         ]
@@ -252,6 +256,14 @@ groceryList model =
 -- form for selecting the meals you would like to combine into a single grocery list
 
 
+groceryFormHeader : Html Msg
+groceryFormHeader =
+    div [ class "component-header" ]
+        [ h2 []
+            [ text "Create a new grocery list" ]
+        ]
+
+
 mealSelect : Model -> List (Html Msg)
 mealSelect model =
     List.map (\meal -> option [] [ text (.name meal) ]) model.mealList
@@ -259,18 +271,23 @@ mealSelect model =
 
 groceryForm : Model -> Html Msg
 groceryForm model =
-    div [ class "component" ]
-        [ input
-            [ type_ "text"
-            , placeholder "Grocery list name"
-            , onInput InputGrocery
-            , value model.grocery
+    div [ class "form-component" ]
+        [ div [ class "form-name-box" ]
+            [ input
+                [ type_ "text"
+                , class "form-input"
+                , placeholder "Grocery list name"
+                , onInput InputGrocery
+                , value model.grocery
+                ]
+                []
+            , button [ type_ "button", class "form-button", onClick SaveGrocery ] [ text "Save grocery list" ]
             ]
-            []
-        , button [ type_ "button", onClick SaveGrocery ] [ text "Save grocery list" ]
-        , Html.form [ onSubmit AddMeal ]
-            [ select [ onInput InputMeal, value model.meal ] (mealSelect model)
-            , button [ type_ "submit" ] [ text "Add to grocery list" ]
+        , div [ class "form-item-box" ]
+            [ Html.form [ onSubmit AddMeal ]
+                [ select [ onInput InputMeal, class "form-input", value model.meal ] (mealSelect model)
+                , button [ type_ "submit", class "form-button" ] [ text "Add to grocery list" ]
+                ]
             ]
         ]
 
@@ -328,23 +345,33 @@ itemMod item =
 -- Form for making a new meal. item name and amount is added to the list one at a time, then saved as a meal
 
 
+mealFormHeader : Html Msg
+mealFormHeader =
+    div [ class "component-header" ]
+        [ h2 []
+            [ text "Create a new meal" ]
+        ]
+
+
 mealForm : Model -> Html Msg
 mealForm model =
-    div []
-        [ div [ class "component" ]
+    div [ class "form-component" ]
+        [ div [ class "form-name-box" ]
             [ input
-                [ type_ "text"
+                [ class "form-input"
+                , type_ "text"
                 , placeholder "Meal name"
                 , onInput InputMeal
                 , value model.meal
                 ]
                 []
-            , button [ type_ "button", onClick SaveMeal ] [ text "Save meal" ]
+            , button [ type_ "button", class "form-button", onClick SaveMeal ] [ text "Save meal" ]
             ]
-        , div [ class "component" ]
+        , div [ class "form-item-box" ]
             [ Html.form [ onSubmit AddItem ]
                 [ input
-                    [ type_ "text"
+                    [ class "form-input"
+                    , type_ "text"
                     , placeholder "Add new item"
                     , onInput InputItem
                     , value model.item
@@ -352,14 +379,16 @@ mealForm model =
                     ]
                     []
                 , input
-                    [ type_ "text"
+                    [ class "form-input"
+                    , type_ "text"
                     , placeholder "Amount"
                     , onInput InputAmount
                     , value (String.fromFloat model.amount)
                     ]
                     []
                 , select
-                    [ onInput InputUnit
+                    [ class "form-input"
+                    , onInput InputUnit
                     , value model.unit
                     ]
                     [ option [] [ text "lbs" ]
@@ -369,7 +398,7 @@ mealForm model =
                     , option [] [ text "pnt" ]
                     , option [] [ text "qty" ]
                     ]
-                , button [ type_ "submit" ] [ text "Add" ]
+                , button [ type_ "submit", class "form-button" ] [ text "Add" ]
                 ]
             ]
         ]
