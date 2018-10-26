@@ -1,6 +1,6 @@
 body {
     margin: 0 20% 0 20%;
-    background-color: #e8e4de
+    background-color: #e8e4de;
 }
 
 .page-header {
@@ -29,7 +29,7 @@ body {
     border-right: solid 1px #7a5a2c;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
-    box-sizing: border-box
+    box-sizing: border-box;
 }
 
 .component-header {
@@ -44,7 +44,7 @@ body {
     border-left: solid 1px #7a5a2c;
     border-right: solid 1px #7a5a2c;
     border-top: solid 1px #7a5a2c;
-    border-bottom: solid 3px #7a5a2c
+    border-bottom: solid 3px #7a5a2c;
 }
 
 .form-component {
@@ -58,7 +58,7 @@ body {
     display: flex;
     justify-content: flex-end;
     margin-right: 27.8%;
-    height: 35px
+    height: 35px;
 }
 
 .form-item-box {
@@ -66,7 +66,7 @@ body {
     justify-content: flex-end;
     padding: 3%;
     margin-right: 8.5%;
-    height: 35px
+    height: 35px;
 }
 
 .form-input {
@@ -74,13 +74,13 @@ body {
     padding: 1%;
     margin-right: 2%;
     border-radius: 3px;
-    font-family: 'Open Sans', sans-serif
+    font-family: 'Open Sans', sans-serif;
 }
 
 .form-input:focus {
     border: solid 1px #467077;
     box-shadow: 0 0 5px #6196a0;
-    padding: 1%
+    padding: 1%;
 }
 
 .form-button {
@@ -90,13 +90,13 @@ body {
     background-color: #dbb67f;
     color: #f7f4ef;
     border-radius: 3px;
-    font-family: 'Open Sans', sans-serif
+    font-family: 'Open Sans', sans-serif;
 }
 
 .component {
     display: flex;
     justify-content: center;
-    background-color: #f7f4ef
+    background-color: #f7f4ef;
 }
 
 .item-list-header {
@@ -117,7 +117,7 @@ body {
     background-color: #f7f4ef;
     font-family: 'Open Sans', sans-serif;
     border: solid 1px #7a5a2c;
-    color: #7a5a2c
+    color: #7a5a2c;
 
 }
 /* #e5c28e; */

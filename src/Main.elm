@@ -109,25 +109,46 @@ update msg model =
             ( { model | grocery = grocery }, Cmd.none )
 
         AddItem ->
-            ( { model
-                | itemList = Item model.item model.amount model.unit :: model.itemList
-                , item = ""
-                , amount = 0
-                , unit = ""
-              }
-            , Cmd.none
-            )
+            Debug.log "Add an item to a meal list"
+                ( { model
+                    | itemList = Item model.item model.amount model.unit :: model.itemList
+                    , item = ""
+                    , amount = 0
+                    , unit = ""
+                }
+                , Cmd.none
+                )
 
         AddMeal ->
-            ( addItems model, Cmd.none )
+            Debug.log "Add a meal to a grocery list"
+                ( addItems model, Cmd.none )
 
         SaveMeal ->
-            Debug.log "Save meal"
+            Debug.log "New meal list"
                 ( createMeal model, Cmd.none )
-
+        SaveGrocery -> 
+            Debug.log "New grocery list" 
+                ( createGrocery model, Cmd.none )
         _ ->
             ( model, Cmd.none )
 
+
+--save a new grocery list, used by SaveGrocery
+
+createGrocery : Model -> Model
+createGrocery model =
+    let
+        newGrocery =
+            Grocery model.grocery model.groceryList
+
+        newGroceryList =
+            newGrocery :: model.groceryListAll
+    in
+    { model
+        | groceryListAll = newGroceryList
+        , grocery = ""
+        , groceryList = []
+    }
 
 
 -- add list of items from a meal to a grocery list, increasing the amount if the item already exists in the grocery list
@@ -145,10 +166,35 @@ addItems model =
             findMeal model
                 |> List.map (\m -> m.itemList)
                 |> List.foldl (++) []
+                |> convertToDictAndSumAmount
+                |> Dict.values
     in
     { model
-        | groceryList = meal ++ model.groceryList
+        | groceryList = List.sortBy .name (meal ++ model.groceryList)
     }
+
+
+convertToDictAndSumAmount : List Item -> Dict String Item
+convertToDictAndSumAmount meals =
+    let
+        newDict : Dict String Item
+        newDict =
+            Dict.empty
+    in
+    List.foldl
+        (\item dict ->
+            let
+                itemKey =
+                    .name item
+            in
+            if Dict.member itemKey dict then
+                Dict.update itemKey (Maybe.map (\record -> { record | amount = record.amount + item.amount })) dict
+
+            else
+                Dict.insert itemKey item dict
+        )
+        newDict
+        meals
 
 
 
@@ -219,35 +265,9 @@ grocerySection model =
         ]
 
 
-convertToDictAndSumAmount : List Item -> Dict String Item
-convertToDictAndSumAmount meals =
-    let
-        newDict : Dict String Item
-        newDict =
-            Dict.empty
-    in
-    List.foldl
-        (\item dict ->
-            let
-                itemKey =
-                    .name item
-            in
-            if Dict.member itemKey dict then
-                Dict.update itemKey (Maybe.map (\record -> { record | amount = record.amount + item.amount })) dict
-
-            else
-                Dict.insert itemKey item dict
-        )
-        newDict
-        meals
-
-
 groceryList : Model -> Html Msg
 groceryList model =
     model.groceryList
-        |> List.sortBy .name
-        |> convertToDictAndSumAmount
-        |> Dict.values
         |> List.map itemMod
         |> ul []
 
