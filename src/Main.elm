@@ -109,37 +109,41 @@ update msg model =
             ( { model | grocery = grocery }, Cmd.none )
 
         AddItem ->
-            Debug.log "Add an item to a meal list"
-                ( { model
-                    | itemList = Item model.item model.amount model.unit :: model.itemList
-                    , item = ""
-                    , amount = 0
-                    , unit = ""
-                }
-                , Cmd.none
-                )
+            ( createItem model, Cmd.none )
 
         AddMeal ->
-            Debug.log "Add a meal to a grocery list"
-                ( addItems model, Cmd.none )
+            ( addItems model, Cmd.none )
 
         SaveMeal ->
-            Debug.log "New meal list"
-                ( createMeal model, Cmd.none )
-        SaveGrocery -> 
-            Debug.log "New grocery list" 
-                ( createGrocery model, Cmd.none )
+            ( createMeal model, Cmd.none )
+
+        SaveGrocery ->
+            ( createGrocery model, Cmd.none )
+
         _ ->
             ( model, Cmd.none )
 
 
+
+-- format input for comparison purposes
+
+
+formatString : String -> String
+formatString input =
+    input
+        |> String.toLower
+        |> String.trim
+
+
+
 --save a new grocery list, used by SaveGrocery
+
 
 createGrocery : Model -> Model
 createGrocery model =
     let
         newGrocery =
-            Grocery model.grocery model.groceryList
+            Grocery (formatString model.grocery) model.groceryList
 
         newGroceryList =
             newGrocery :: model.groceryListAll
@@ -149,6 +153,7 @@ createGrocery model =
         , grocery = ""
         , groceryList = []
     }
+
 
 
 -- add list of items from a meal to a grocery list, increasing the amount if the item already exists in the grocery list
@@ -166,12 +171,15 @@ addItems model =
             findMeal model
                 |> List.map (\m -> m.itemList)
                 |> List.foldl (++) []
+
+        newMealList =
+            meal ++ model.groceryList 
+                |> List.sortBy .name  
                 |> convertToDictAndSumAmount
-                |> Dict.values
+                |> Dict.values  
+                
     in
-    { model
-        | groceryList = List.sortBy .name (meal ++ model.groceryList)
-    }
+        { model | groceryList = newMealList }
 
 
 convertToDictAndSumAmount : List Item -> Dict String Item
@@ -205,7 +213,7 @@ createMeal : Model -> Model
 createMeal model =
     let
         newMeal =
-            Meal model.meal model.itemList
+            Meal (formatString model.meal) model.itemList
 
         newMealList =
             newMeal :: model.mealList
@@ -216,6 +224,16 @@ createMeal model =
         , itemList = []
     }
 
+-- create a new item to the item list 
+
+createItem : Model -> Model  
+createItem model =
+    { model
+        | itemList = Item (formatString model.item) model.amount model.unit :: model.itemList
+        , item = ""
+        , amount = 0
+        , unit = ""
+        }
 
 
 -- SUBSCRIPTIONS
@@ -240,17 +258,75 @@ view : Model -> Document Msg
 view model =
     { title = "Meal to List App"
     , body =
-        [ div [ class "page-header" ] [ h1 [ id "title" ] [ text "Meal to List App" ] ]
-        , div [ class "header-break" ] []
+        [ titleDiv
+        , lineBreak
         , mealFormHeader
         , mealForm model
         , itemSection model
-        , div [ class "header-break" ] []
+        , lineBreak
         , groceryFormHeader
         , groceryForm model
         , grocerySection model
+        , lineBreak
+        , mealListSelection model
+        , lineBreak
+        , groceryListSelection model
         ]
     }
+
+
+titleDiv : Html Msg
+titleDiv =
+    div [ class "page-header" ] [ h1 [ id "title" ] [ text "Meal to List App" ] ]
+
+
+lineBreak : Html Msg
+lineBreak =
+    div [ class "header-break" ] []
+
+
+
+-- grocery list selection component
+
+
+groceryListSelectionHeader : Html Msg
+groceryListSelectionHeader =
+    h2 [ class "component-header" ] [ text "Grocery Lists" ]
+
+
+groceryNameList : Model -> List (Html Msg)
+groceryNameList model =
+    List.map (\meal -> li [] [ text meal.name ]) model.groceryListAll
+
+
+groceryListSelection : Model -> Html Msg
+groceryListSelection model =
+    div []
+        [ groceryListSelectionHeader
+        , ul [] (groceryNameList model)
+        ]
+
+
+
+-- meal list selection component
+
+
+mealListSelectionHeader : Html Msg
+mealListSelectionHeader =
+    h2 [ class "component-header" ] [ text "Meals" ]
+
+
+mealNameList : Model -> List (Html Msg)
+mealNameList model =
+    List.map (\meal -> li [] [ text meal.name ]) model.mealList
+
+
+mealListSelection : Model -> Html Msg
+mealListSelection model =
+    div []
+        [ mealListSelectionHeader
+        , ul [] (mealNameList model)
+        ]
 
 
 
@@ -295,6 +371,7 @@ groceryForm model =
         [ div [ class "form-name-box" ]
             [ input
                 [ type_ "text"
+                , required True
                 , class "form-input"
                 , placeholder "Grocery list name"
                 , onInput InputGrocery
@@ -305,10 +382,13 @@ groceryForm model =
             ]
         , div [ class "form-item-box" ]
             [ Html.form [ onSubmit AddMeal ]
-                [ select [ onInput InputMeal
+                [ select
+                    [ onInput InputMeal
+                    , required True
                     , class "form-input"
-                    , value model.meal ] 
-                        ((option [] [ text "choose a meal" ]) :: (mealSelect model))
+                    , value model.meal
+                    ]
+                    (option [] [ text "choose a meal" ] :: mealSelect model)
                 , button [ type_ "submit", class "form-button" ] [ text "Add to grocery list" ]
                 ]
             ]
@@ -383,6 +463,7 @@ mealForm model =
             [ input
                 [ class "form-input"
                 , type_ "text"
+                , required True
                 , placeholder "Meal name"
                 , onInput InputMeal
                 , value model.meal
@@ -399,20 +480,27 @@ mealForm model =
                     , onInput InputItem
                     , value model.item
                     , selected True
+                    , required True
                     ]
                     []
                 , input
                     [ class "form-input"
                     , type_ "text"
+                    , required True
                     , placeholder "Amount"
                     , onInput InputAmount
-                    , value (String.fromFloat model.amount)
+                    , value
+                        (model.amount
+                            |> String.fromFloat
+                            |> formatString
+                        )
                     ]
                     []
                 , select
                     [ class "form-input"
                     , onInput InputUnit
                     , value model.unit
+                    , required True
                     ]
                     [ option [] [ text "pound(s)" ]
                     , option [] [ text "ounce" ]

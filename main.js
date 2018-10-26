@@ -4776,10 +4776,6 @@ var elm$core$Platform$Sub$none = elm$core$Platform$Sub$batch(_List_Nil);
 var author$project$Main$subscriptions = function (model) {
 	return elm$core$Platform$Sub$none;
 };
-var author$project$Main$Item = F3(
-	function (name, amount, unit) {
-		return {amount: amount, name: name, unit: unit};
-	});
 var elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
 var elm$core$Dict$empty = elm$core$Dict$RBEmpty_elm_builtin;
 var elm$core$Dict$Black = {$: 'Black'};
@@ -5437,52 +5433,83 @@ var elm$core$List$map = F2(
 	});
 var elm$core$List$sortBy = _List_sortBy;
 var author$project$Main$addItems = function (model) {
-	var meal = elm$core$Dict$values(
+	var meal = A3(
+		elm$core$List$foldl,
+		elm$core$Basics$append,
+		_List_Nil,
+		A2(
+			elm$core$List$map,
+			function (m) {
+				return m.itemList;
+			},
+			author$project$Main$findMeal(model)));
+	var newMealList = elm$core$Dict$values(
 		author$project$Main$convertToDictAndSumAmount(
 			A2(
 				elm$core$List$sortBy,
 				function ($) {
 					return $.name;
 				},
-				A3(
-					elm$core$List$foldl,
-					elm$core$Basics$append,
-					_List_Nil,
-					A2(
-						elm$core$List$map,
-						function (m) {
-							return m.itemList;
-						},
-						author$project$Main$findMeal(model))))));
+				_Utils_ap(meal, model.groceryList))));
 	return _Utils_update(
 		model,
-		{
-			groceryList: _Utils_ap(meal, model.groceryList)
-		});
+		{groceryList: newMealList});
 };
 var author$project$Main$Grocery = F2(
 	function (name, items) {
 		return {items: items, name: name};
 	});
+var elm$core$String$toLower = _String_toLower;
+var elm$core$String$trim = _String_trim;
+var author$project$Main$formatString = function (input) {
+	return elm$core$String$trim(
+		elm$core$String$toLower(input));
+};
 var author$project$Main$createGrocery = function (model) {
-	var newGrocery = A2(author$project$Main$Grocery, model.grocery, model.groceryList);
+	var newGrocery = A2(
+		author$project$Main$Grocery,
+		author$project$Main$formatString(model.grocery),
+		model.groceryList);
 	var newGroceryList = A2(elm$core$List$cons, newGrocery, model.groceryListAll);
 	return _Utils_update(
 		model,
 		{grocery: '', groceryList: _List_Nil, groceryListAll: newGroceryList});
+};
+var author$project$Main$Item = F3(
+	function (name, amount, unit) {
+		return {amount: amount, name: name, unit: unit};
+	});
+var author$project$Main$createItem = function (model) {
+	return _Utils_update(
+		model,
+		{
+			amount: 0,
+			item: '',
+			itemList: A2(
+				elm$core$List$cons,
+				A3(
+					author$project$Main$Item,
+					author$project$Main$formatString(model.item),
+					model.amount,
+					model.unit),
+				model.itemList),
+			unit: ''
+		});
 };
 var author$project$Main$Meal = F2(
 	function (name, itemList) {
 		return {itemList: itemList, name: name};
 	});
 var author$project$Main$createMeal = function (model) {
-	var newMeal = A2(author$project$Main$Meal, model.meal, model.itemList);
+	var newMeal = A2(
+		author$project$Main$Meal,
+		author$project$Main$formatString(model.meal),
+		model.itemList);
 	var newMealList = A2(elm$core$List$cons, newMeal, model.mealList);
 	return _Utils_update(
 		model,
 		{itemList: _List_Nil, meal: '', mealList: newMealList});
 };
-var elm$core$Debug$log = _Debug_log;
 var elm$core$Maybe$withDefault = F2(
 	function (_default, maybe) {
 		if (maybe.$ === 'Just') {
@@ -5537,43 +5564,21 @@ var author$project$Main$update = F2(
 						{grocery: grocery}),
 					elm$core$Platform$Cmd$none);
 			case 'AddItem':
-				return A2(
-					elm$core$Debug$log,
-					'Add an item to a meal list',
-					_Utils_Tuple2(
-						_Utils_update(
-							model,
-							{
-								amount: 0,
-								item: '',
-								itemList: A2(
-									elm$core$List$cons,
-									A3(author$project$Main$Item, model.item, model.amount, model.unit),
-									model.itemList),
-								unit: ''
-							}),
-						elm$core$Platform$Cmd$none));
+				return _Utils_Tuple2(
+					author$project$Main$createItem(model),
+					elm$core$Platform$Cmd$none);
 			case 'AddMeal':
-				return A2(
-					elm$core$Debug$log,
-					'Add a meal to a grocery list',
-					_Utils_Tuple2(
-						author$project$Main$addItems(model),
-						elm$core$Platform$Cmd$none));
+				return _Utils_Tuple2(
+					author$project$Main$addItems(model),
+					elm$core$Platform$Cmd$none);
 			case 'SaveMeal':
-				return A2(
-					elm$core$Debug$log,
-					'New meal list',
-					_Utils_Tuple2(
-						author$project$Main$createMeal(model),
-						elm$core$Platform$Cmd$none));
+				return _Utils_Tuple2(
+					author$project$Main$createMeal(model),
+					elm$core$Platform$Cmd$none);
 			case 'SaveGrocery':
-				return A2(
-					elm$core$Debug$log,
-					'New grocery list',
-					_Utils_Tuple2(
-						author$project$Main$createGrocery(model),
-						elm$core$Platform$Cmd$none));
+				return _Utils_Tuple2(
+					author$project$Main$createGrocery(model),
+					elm$core$Platform$Cmd$none);
 			default:
 				return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 		}
@@ -5639,6 +5644,15 @@ var elm$html$Html$Attributes$stringProperty = F2(
 	});
 var elm$html$Html$Attributes$class = elm$html$Html$Attributes$stringProperty('className');
 var elm$html$Html$Attributes$placeholder = elm$html$Html$Attributes$stringProperty('placeholder');
+var elm$json$Json$Encode$bool = _Json_wrap;
+var elm$html$Html$Attributes$boolProperty = F2(
+	function (key, bool) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			elm$json$Json$Encode$bool(bool));
+	});
+var elm$html$Html$Attributes$required = elm$html$Html$Attributes$boolProperty('required');
 var elm$html$Html$Attributes$type_ = elm$html$Html$Attributes$stringProperty('type');
 var elm$html$Html$Attributes$value = elm$html$Html$Attributes$stringProperty('value');
 var elm$virtual_dom$VirtualDom$Normal = function (a) {
@@ -5735,6 +5749,7 @@ var author$project$Main$groceryForm = function (model) {
 						_List_fromArray(
 							[
 								elm$html$Html$Attributes$type_('text'),
+								elm$html$Html$Attributes$required(true),
 								elm$html$Html$Attributes$class('form-input'),
 								elm$html$Html$Attributes$placeholder('Grocery list name'),
 								elm$html$Html$Events$onInput(author$project$Main$InputGrocery),
@@ -5775,6 +5790,7 @@ var author$project$Main$groceryForm = function (model) {
 								_List_fromArray(
 									[
 										elm$html$Html$Events$onInput(author$project$Main$InputMeal),
+										elm$html$Html$Attributes$required(true),
 										elm$html$Html$Attributes$class('form-input'),
 										elm$html$Html$Attributes$value(model.meal)
 									]),
@@ -5820,8 +5836,46 @@ var author$project$Main$groceryFormHeader = A2(
 					elm$html$Html$text('Create a new grocery list')
 				]))
 		]));
-var elm$core$String$fromFloat = _String_fromNumber;
+var author$project$Main$groceryListSelectionHeader = A2(
+	elm$html$Html$h2,
+	_List_fromArray(
+		[
+			elm$html$Html$Attributes$class('component-header')
+		]),
+	_List_fromArray(
+		[
+			elm$html$Html$text('Grocery Lists')
+		]));
 var elm$html$Html$li = _VirtualDom_node('li');
+var author$project$Main$groceryNameList = function (model) {
+	return A2(
+		elm$core$List$map,
+		function (meal) {
+			return A2(
+				elm$html$Html$li,
+				_List_Nil,
+				_List_fromArray(
+					[
+						elm$html$Html$text(meal.name)
+					]));
+		},
+		model.groceryListAll);
+};
+var elm$html$Html$ul = _VirtualDom_node('ul');
+var author$project$Main$groceryListSelection = function (model) {
+	return A2(
+		elm$html$Html$div,
+		_List_Nil,
+		_List_fromArray(
+			[
+				author$project$Main$groceryListSelectionHeader,
+				A2(
+				elm$html$Html$ul,
+				_List_Nil,
+				author$project$Main$groceryNameList(model))
+			]));
+};
+var elm$core$String$fromFloat = _String_fromNumber;
 var elm$html$Html$p = _VirtualDom_node('p');
 var author$project$Main$itemMod = function (item) {
 	return A2(
@@ -5874,7 +5928,6 @@ var author$project$Main$itemMod = function (item) {
 					]))
 			]));
 };
-var elm$html$Html$ul = _VirtualDom_node('ul');
 var author$project$Main$groceryList = function (model) {
 	return A2(
 		elm$html$Html$ul,
@@ -5945,6 +5998,13 @@ var author$project$Main$itemSection = function (model) {
 				author$project$Main$itemList(model)
 			]));
 };
+var author$project$Main$lineBreak = A2(
+	elm$html$Html$div,
+	_List_fromArray(
+		[
+			elm$html$Html$Attributes$class('header-break')
+		]),
+	_List_Nil);
 var author$project$Main$AddItem = {$: 'AddItem'};
 var author$project$Main$InputAmount = function (a) {
 	return {$: 'InputAmount', a: a};
@@ -5956,14 +6016,6 @@ var author$project$Main$InputUnit = function (a) {
 	return {$: 'InputUnit', a: a};
 };
 var author$project$Main$SaveMeal = {$: 'SaveMeal'};
-var elm$json$Json$Encode$bool = _Json_wrap;
-var elm$html$Html$Attributes$boolProperty = F2(
-	function (key, bool) {
-		return A2(
-			_VirtualDom_property,
-			key,
-			elm$json$Json$Encode$bool(bool));
-	});
 var elm$html$Html$Attributes$selected = elm$html$Html$Attributes$boolProperty('selected');
 var author$project$Main$mealForm = function (model) {
 	return A2(
@@ -5988,6 +6040,7 @@ var author$project$Main$mealForm = function (model) {
 							[
 								elm$html$Html$Attributes$class('form-input'),
 								elm$html$Html$Attributes$type_('text'),
+								elm$html$Html$Attributes$required(true),
 								elm$html$Html$Attributes$placeholder('Meal name'),
 								elm$html$Html$Events$onInput(author$project$Main$InputMeal),
 								elm$html$Html$Attributes$value(model.meal)
@@ -6031,7 +6084,8 @@ var author$project$Main$mealForm = function (model) {
 										elm$html$Html$Attributes$placeholder('Add new item'),
 										elm$html$Html$Events$onInput(author$project$Main$InputItem),
 										elm$html$Html$Attributes$value(model.item),
-										elm$html$Html$Attributes$selected(true)
+										elm$html$Html$Attributes$selected(true),
+										elm$html$Html$Attributes$required(true)
 									]),
 								_List_Nil),
 								A2(
@@ -6040,10 +6094,12 @@ var author$project$Main$mealForm = function (model) {
 									[
 										elm$html$Html$Attributes$class('form-input'),
 										elm$html$Html$Attributes$type_('text'),
+										elm$html$Html$Attributes$required(true),
 										elm$html$Html$Attributes$placeholder('Amount'),
 										elm$html$Html$Events$onInput(author$project$Main$InputAmount),
 										elm$html$Html$Attributes$value(
-										elm$core$String$fromFloat(model.amount))
+										author$project$Main$formatString(
+											elm$core$String$fromFloat(model.amount)))
 									]),
 								_List_Nil),
 								A2(
@@ -6052,7 +6108,8 @@ var author$project$Main$mealForm = function (model) {
 									[
 										elm$html$Html$Attributes$class('form-input'),
 										elm$html$Html$Events$onInput(author$project$Main$InputUnit),
-										elm$html$Html$Attributes$value(model.unit)
+										elm$html$Html$Attributes$value(model.unit),
+										elm$html$Html$Attributes$required(true)
 									]),
 								_List_fromArray(
 									[
@@ -6144,51 +6201,81 @@ var author$project$Main$mealFormHeader = A2(
 					elm$html$Html$text('Create a new meal')
 				]))
 		]));
+var author$project$Main$mealListSelectionHeader = A2(
+	elm$html$Html$h2,
+	_List_fromArray(
+		[
+			elm$html$Html$Attributes$class('component-header')
+		]),
+	_List_fromArray(
+		[
+			elm$html$Html$text('Meals')
+		]));
+var author$project$Main$mealNameList = function (model) {
+	return A2(
+		elm$core$List$map,
+		function (meal) {
+			return A2(
+				elm$html$Html$li,
+				_List_Nil,
+				_List_fromArray(
+					[
+						elm$html$Html$text(meal.name)
+					]));
+		},
+		model.mealList);
+};
+var author$project$Main$mealListSelection = function (model) {
+	return A2(
+		elm$html$Html$div,
+		_List_Nil,
+		_List_fromArray(
+			[
+				author$project$Main$mealListSelectionHeader,
+				A2(
+				elm$html$Html$ul,
+				_List_Nil,
+				author$project$Main$mealNameList(model))
+			]));
+};
 var elm$html$Html$h1 = _VirtualDom_node('h1');
 var elm$html$Html$Attributes$id = elm$html$Html$Attributes$stringProperty('id');
+var author$project$Main$titleDiv = A2(
+	elm$html$Html$div,
+	_List_fromArray(
+		[
+			elm$html$Html$Attributes$class('page-header')
+		]),
+	_List_fromArray(
+		[
+			A2(
+			elm$html$Html$h1,
+			_List_fromArray(
+				[
+					elm$html$Html$Attributes$id('title')
+				]),
+			_List_fromArray(
+				[
+					elm$html$Html$text('Meal to List App')
+				]))
+		]));
 var author$project$Main$view = function (model) {
 	return {
 		body: _List_fromArray(
 			[
-				A2(
-				elm$html$Html$div,
-				_List_fromArray(
-					[
-						elm$html$Html$Attributes$class('page-header')
-					]),
-				_List_fromArray(
-					[
-						A2(
-						elm$html$Html$h1,
-						_List_fromArray(
-							[
-								elm$html$Html$Attributes$id('title')
-							]),
-						_List_fromArray(
-							[
-								elm$html$Html$text('Meal to List App')
-							]))
-					])),
-				A2(
-				elm$html$Html$div,
-				_List_fromArray(
-					[
-						elm$html$Html$Attributes$class('header-break')
-					]),
-				_List_Nil),
+				author$project$Main$titleDiv,
+				author$project$Main$lineBreak,
 				author$project$Main$mealFormHeader,
 				author$project$Main$mealForm(model),
 				author$project$Main$itemSection(model),
-				A2(
-				elm$html$Html$div,
-				_List_fromArray(
-					[
-						elm$html$Html$Attributes$class('header-break')
-					]),
-				_List_Nil),
+				author$project$Main$lineBreak,
 				author$project$Main$groceryFormHeader,
 				author$project$Main$groceryForm(model),
-				author$project$Main$grocerySection(model)
+				author$project$Main$grocerySection(model),
+				author$project$Main$lineBreak,
+				author$project$Main$mealListSelection(model),
+				author$project$Main$lineBreak,
+				author$project$Main$groceryListSelection(model)
 			]),
 		title: 'Meal to List App'
 	};
