@@ -285,7 +285,10 @@ groceryForm model =
             ]
         , div [ class "form-item-box" ]
             [ Html.form [ onSubmit AddMeal ]
-                [ select [ onInput InputMeal, class "form-input", value model.meal ] (mealSelect model)
+                [ select [ onInput InputMeal
+                    , class "form-input"
+                    , value model.meal ] 
+                        ((option [] [ text "choose a meal" ]) :: (mealSelect model))
                 , button [ type_ "submit", class "form-button" ] [ text "Add to grocery list" ]
                 ]
             ]
@@ -308,7 +311,7 @@ itemListHeader : Html Msg
 itemListHeader =
     header []
         [ div
-            [ class "header" ]
+            [ class "item-list-header" ]
             [ h4 [] [ text "Item" ]
             , h4 [] [ text "Amount" ]
             , h4 [] [ text "Unit" ]
@@ -325,7 +328,7 @@ itemList model =
 
 itemMod : Item -> Html Msg
 itemMod item =
-    li [ class "header" ]
+    li [ class "item-list" ]
         [ div
             []
             [ p [] [ text item.name ]
@@ -391,12 +394,14 @@ mealForm model =
                     , onInput InputUnit
                     , value model.unit
                     ]
-                    [ option [] [ text "lbs" ]
-                    , option [] [ text "pkg" ]
-                    , option [] [ text "qrt" ]
-                    , option [] [ text "gal" ]
-                    , option [] [ text "pnt" ]
-                    , option [] [ text "qty" ]
+                    [ option [] [ text "pound(s)" ]
+                    , option [] [ text "ounce" ]
+                    , option [] [ text "gallon" ]
+                    , option [] [ text "quart" ]
+                    , option [] [ text "pint" ]
+                    , option [] [ text "liter" ]
+                    , option [] [ text "item" ]
+                    , option [] [ text "package" ]
                     ]
                 , button [ type_ "submit", class "form-button" ] [ text "Add" ]
                 ]

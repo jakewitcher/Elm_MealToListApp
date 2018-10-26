@@ -99,5 +99,25 @@ body {
     background-color: #f7f4ef
 }
 
+.item-list-header {
+    display: flex;
+    justify-content: space-around;
+    background-color: #f7f4ef;
+    font-family: 'Playfair Display', serif;
+    color: #7a5a2c;
+    border-left: solid 1px #7a5a2c;
+    border-right: solid 1px #7a5a2c;
+    border-top: solid 1px #7a5a2c;
+    border-bottom: solid 3px #7a5a2c;
+}
 
+.item-list {
+    display: flex;
+    justify-content: space-around;
+    background-color: #f7f4ef;
+    font-family: 'Open Sans', sans-serif;
+    border: solid 1px #7a5a2c;
+    color: #7a5a2c
+
+}
 /* #e5c28e; */

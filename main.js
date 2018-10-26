@@ -5179,7 +5179,16 @@ var author$project$Main$groceryForm = function (model) {
 										elm$html$Html$Attributes$class('form-input'),
 										elm$html$Html$Attributes$value(model.meal)
 									]),
-								author$project$Main$mealSelect(model)),
+								A2(
+									elm$core$List$cons,
+									A2(
+										elm$html$Html$option,
+										_List_Nil,
+										_List_fromArray(
+											[
+												elm$html$Html$text('choose a meal')
+											])),
+									author$project$Main$mealSelect(model))),
 								A2(
 								elm$html$Html$button,
 								_List_fromArray(
@@ -5777,7 +5786,7 @@ var author$project$Main$itemMod = function (item) {
 		elm$html$Html$li,
 		_List_fromArray(
 			[
-				elm$html$Html$Attributes$class('header')
+				elm$html$Html$Attributes$class('item-list')
 			]),
 		_List_fromArray(
 			[
@@ -5862,7 +5871,7 @@ var author$project$Main$itemListHeader = A2(
 			elm$html$Html$div,
 			_List_fromArray(
 				[
-					elm$html$Html$Attributes$class('header')
+					elm$html$Html$Attributes$class('item-list-header')
 				]),
 			_List_fromArray(
 				[
@@ -6031,42 +6040,56 @@ var author$project$Main$mealForm = function (model) {
 										_List_Nil,
 										_List_fromArray(
 											[
-												elm$html$Html$text('lbs')
+												elm$html$Html$text('pound(s)')
 											])),
 										A2(
 										elm$html$Html$option,
 										_List_Nil,
 										_List_fromArray(
 											[
-												elm$html$Html$text('pkg')
+												elm$html$Html$text('ounce')
 											])),
 										A2(
 										elm$html$Html$option,
 										_List_Nil,
 										_List_fromArray(
 											[
-												elm$html$Html$text('qrt')
+												elm$html$Html$text('gallon')
 											])),
 										A2(
 										elm$html$Html$option,
 										_List_Nil,
 										_List_fromArray(
 											[
-												elm$html$Html$text('gal')
+												elm$html$Html$text('quart')
 											])),
 										A2(
 										elm$html$Html$option,
 										_List_Nil,
 										_List_fromArray(
 											[
-												elm$html$Html$text('pnt')
+												elm$html$Html$text('pint')
 											])),
 										A2(
 										elm$html$Html$option,
 										_List_Nil,
 										_List_fromArray(
 											[
-												elm$html$Html$text('qty')
+												elm$html$Html$text('liter')
+											])),
+										A2(
+										elm$html$Html$option,
+										_List_Nil,
+										_List_fromArray(
+											[
+												elm$html$Html$text('item')
+											])),
+										A2(
+										elm$html$Html$option,
+										_List_Nil,
+										_List_fromArray(
+											[
+												elm$html$Html$text('package')
 											]))
 									])),
 								A2(
