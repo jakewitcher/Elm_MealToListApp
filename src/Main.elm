@@ -30,6 +30,8 @@ type alias Model =
     , mealList : List Meal
     , groceryList : List Item
     , groceryListAll : List Grocery
+    , selectedMeal : List Meal
+    , selectedGrocery : List Grocery
     }
 
 
@@ -63,6 +65,8 @@ init _ =
       , mealList = []
       , groceryList = []
       , groceryListAll = []
+      , selectedMeal = []
+      , selectedGrocery = []
       }
     , Cmd.none
     )
@@ -82,8 +86,8 @@ type Msg
     | AddMeal
     | SaveMeal
     | SaveGrocery
-    | SelectMeal
-    | SelectGrocery
+    | SelectMeal String
+    | SelectGrocery String 
     | EditMeal
     | EditGrocery
     | DeleteMeal
@@ -120,10 +124,31 @@ update msg model =
         SaveGrocery ->
             ( createGrocery model, Cmd.none )
 
+        SelectMeal meal ->
+            ( { model
+                | selectedMeal = 
+                    findSelectedMeal model meal }, Cmd.none )
+
+        SelectGrocery grocery ->
+            ( { model
+                | selectedGrocery =
+                    findSelectedGrocery model grocery }, Cmd.none )
+
         _ ->
             ( model, Cmd.none )
 
 
+--find selected grocery list and display
+
+findSelectedGrocery : Model -> String -> List Grocery  
+findSelectedGrocery model name =
+    List.filter (\grocery -> name == grocery.name ) model.groceryListAll 
+
+-- find selected meal and display 
+
+findSelectedMeal : Model -> String -> List Meal  
+findSelectedMeal model name =
+    List.filter (\meal -> name == meal.name ) model.mealList 
 
 -- format input for comparison purposes
 
@@ -173,13 +198,13 @@ addItems model =
                 |> List.foldl (++) []
 
         newMealList =
-            meal ++ model.groceryList 
-                |> List.sortBy .name  
+            meal
+                ++ model.groceryList
+                |> List.sortBy .name
                 |> convertToDictAndSumAmount
-                |> Dict.values  
-                
+                |> Dict.values
     in
-        { model | groceryList = newMealList }
+    { model | groceryList = newMealList }
 
 
 convertToDictAndSumAmount : List Item -> Dict String Item
@@ -224,16 +249,20 @@ createMeal model =
         , itemList = []
     }
 
--- create a new item to the item list 
 
-createItem : Model -> Model  
+
+-- create a new item to the item list
+
+
+createItem : Model -> Model
 createItem model =
     { model
         | itemList = Item (formatString model.item) model.amount model.unit :: model.itemList
         , item = ""
         , amount = 0
         , unit = ""
-        }
+    }
+
 
 
 -- SUBSCRIPTIONS
@@ -269,8 +298,10 @@ view model =
         , grocerySection model
         , lineBreak
         , mealListSelection model
+        , if (model.selectedMeal /= []) then selectedMeal model else div [ hidden True ] []
         , lineBreak
         , groceryListSelection model
+        , if (model.selectedGrocery /= []) then selectedGrocery model else div [ hidden True ] []
         ]
     }
 
@@ -285,8 +316,34 @@ lineBreak =
     div [ class "header-break" ] []
 
 
-
 -- grocery list selection component
+
+selectedGroceryName : Model -> Html Msg
+selectedGroceryName model =
+    h2 [] 
+        (List.map(\grocery -> text grocery.name) model.selectedGrocery)
+
+selectedGroceryItems : Model -> Html Msg
+selectedGroceryItems model =
+    model.selectedGrocery
+        |> List.foldl (\grocery list-> grocery.items ++ list ) []
+        |> List.map itemMod
+        |> ul []
+
+selectedGroceryBody : Model -> Html Msg
+selectedGroceryBody model =
+    div [] 
+        [ itemListHeader
+        , selectedGroceryItems model
+    ]
+
+
+selectedGrocery : Model -> Html Msg
+selectedGrocery model =
+    div []
+        [ selectedGroceryName model 
+        , selectedGroceryBody model
+        ]
 
 
 groceryListSelectionHeader : Html Msg
@@ -296,7 +353,7 @@ groceryListSelectionHeader =
 
 groceryNameList : Model -> List (Html Msg)
 groceryNameList model =
-    List.map (\meal -> li [] [ text meal.name ]) model.groceryListAll
+    List.map (\grocery -> li [ onClick (SelectGrocery grocery.name) ] [ text grocery.name ]) model.groceryListAll
 
 
 groceryListSelection : Model -> Html Msg
@@ -311,6 +368,34 @@ groceryListSelection model =
 -- meal list selection component
 
 
+selectedMealName : Model -> Html Msg
+selectedMealName model =
+    h2 [] 
+        (List.map(\meal -> text meal.name) model.selectedMeal)
+
+selectedMealItems : Model -> Html Msg
+selectedMealItems model =
+    model.selectedMeal
+        |> List.foldl (\meal list-> meal.itemList ++ list ) []
+        |> List.map itemMod
+        |> ul []
+
+selectedMealBody : Model -> Html Msg
+selectedMealBody model =
+    div [] 
+        [ itemListHeader
+        , selectedMealItems model
+    ]
+
+
+selectedMeal : Model -> Html Msg
+selectedMeal model =
+    div []
+        [ selectedMealName model 
+        , selectedMealBody model
+        ]
+
+
 mealListSelectionHeader : Html Msg
 mealListSelectionHeader =
     h2 [ class "component-header" ] [ text "Meals" ]
@@ -318,7 +403,7 @@ mealListSelectionHeader =
 
 mealNameList : Model -> List (Html Msg)
 mealNameList model =
-    List.map (\meal -> li [] [ text meal.name ]) model.mealList
+    List.map (\meal -> li [ onClick (SelectMeal meal.name) ] [ text meal.name ]) model.mealList
 
 
 mealListSelection : Model -> Html Msg

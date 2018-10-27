@@ -4768,7 +4768,7 @@ var elm$core$Platform$Cmd$batch = _Platform_batch;
 var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
 var author$project$Main$init = function (_n0) {
 	return _Utils_Tuple2(
-		{amount: 0, grocery: '', groceryList: _List_Nil, groceryListAll: _List_Nil, item: '', itemList: _List_Nil, meal: '', mealList: _List_Nil, unit: ''},
+		{amount: 0, grocery: '', groceryList: _List_Nil, groceryListAll: _List_Nil, item: '', itemList: _List_Nil, meal: '', mealList: _List_Nil, selectedGrocery: _List_Nil, selectedMeal: _List_Nil, unit: ''},
 		elm$core$Platform$Cmd$none);
 };
 var elm$core$Platform$Sub$batch = _Platform_batch;
@@ -5510,6 +5510,24 @@ var author$project$Main$createMeal = function (model) {
 		model,
 		{itemList: _List_Nil, meal: '', mealList: newMealList});
 };
+var author$project$Main$findSelectedGrocery = F2(
+	function (model, name) {
+		return A2(
+			elm$core$List$filter,
+			function (grocery) {
+				return _Utils_eq(name, grocery.name);
+			},
+			model.groceryListAll);
+	});
+var author$project$Main$findSelectedMeal = F2(
+	function (model, name) {
+		return A2(
+			elm$core$List$filter,
+			function (meal) {
+				return _Utils_eq(name, meal.name);
+			},
+			model.mealList);
+	});
 var elm$core$Maybe$withDefault = F2(
 	function (_default, maybe) {
 		if (maybe.$ === 'Just') {
@@ -5578,6 +5596,24 @@ var author$project$Main$update = F2(
 			case 'SaveGrocery':
 				return _Utils_Tuple2(
 					author$project$Main$createGrocery(model),
+					elm$core$Platform$Cmd$none);
+			case 'SelectMeal':
+				var meal = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							selectedMeal: A2(author$project$Main$findSelectedMeal, model, meal)
+						}),
+					elm$core$Platform$Cmd$none);
+			case 'SelectGrocery':
+				var grocery = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							selectedGrocery: A2(author$project$Main$findSelectedGrocery, model, grocery)
+						}),
 					elm$core$Platform$Cmd$none);
 			default:
 				return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
@@ -5846,17 +5882,24 @@ var author$project$Main$groceryListSelectionHeader = A2(
 		[
 			elm$html$Html$text('Grocery Lists')
 		]));
+var author$project$Main$SelectGrocery = function (a) {
+	return {$: 'SelectGrocery', a: a};
+};
 var elm$html$Html$li = _VirtualDom_node('li');
 var author$project$Main$groceryNameList = function (model) {
 	return A2(
 		elm$core$List$map,
-		function (meal) {
+		function (grocery) {
 			return A2(
 				elm$html$Html$li,
-				_List_Nil,
 				_List_fromArray(
 					[
-						elm$html$Html$text(meal.name)
+						elm$html$Html$Events$onClick(
+						author$project$Main$SelectGrocery(grocery.name))
+					]),
+				_List_fromArray(
+					[
+						elm$html$Html$text(grocery.name)
 					]));
 		},
 		model.groceryListAll);
@@ -6211,13 +6254,20 @@ var author$project$Main$mealListSelectionHeader = A2(
 		[
 			elm$html$Html$text('Meals')
 		]));
+var author$project$Main$SelectMeal = function (a) {
+	return {$: 'SelectMeal', a: a};
+};
 var author$project$Main$mealNameList = function (model) {
 	return A2(
 		elm$core$List$map,
 		function (meal) {
 			return A2(
 				elm$html$Html$li,
-				_List_Nil,
+				_List_fromArray(
+					[
+						elm$html$Html$Events$onClick(
+						author$project$Main$SelectMeal(meal.name))
+					]),
 				_List_fromArray(
 					[
 						elm$html$Html$text(meal.name)
@@ -6236,6 +6286,100 @@ var author$project$Main$mealListSelection = function (model) {
 				elm$html$Html$ul,
 				_List_Nil,
 				author$project$Main$mealNameList(model))
+			]));
+};
+var author$project$Main$selectedGroceryItems = function (model) {
+	return A2(
+		elm$html$Html$ul,
+		_List_Nil,
+		A2(
+			elm$core$List$map,
+			author$project$Main$itemMod,
+			A3(
+				elm$core$List$foldl,
+				F2(
+					function (grocery, list) {
+						return _Utils_ap(grocery.items, list);
+					}),
+				_List_Nil,
+				model.selectedGrocery)));
+};
+var author$project$Main$selectedGroceryBody = function (model) {
+	return A2(
+		elm$html$Html$div,
+		_List_Nil,
+		_List_fromArray(
+			[
+				author$project$Main$itemListHeader,
+				author$project$Main$selectedGroceryItems(model)
+			]));
+};
+var author$project$Main$selectedGroceryName = function (model) {
+	return A2(
+		elm$html$Html$h2,
+		_List_Nil,
+		A2(
+			elm$core$List$map,
+			function (grocery) {
+				return elm$html$Html$text(grocery.name);
+			},
+			model.selectedGrocery));
+};
+var author$project$Main$selectedGrocery = function (model) {
+	return A2(
+		elm$html$Html$div,
+		_List_Nil,
+		_List_fromArray(
+			[
+				author$project$Main$selectedGroceryName(model),
+				author$project$Main$selectedGroceryBody(model)
+			]));
+};
+var author$project$Main$selectedMealItems = function (model) {
+	return A2(
+		elm$html$Html$ul,
+		_List_Nil,
+		A2(
+			elm$core$List$map,
+			author$project$Main$itemMod,
+			A3(
+				elm$core$List$foldl,
+				F2(
+					function (meal, list) {
+						return _Utils_ap(meal.itemList, list);
+					}),
+				_List_Nil,
+				model.selectedMeal)));
+};
+var author$project$Main$selectedMealBody = function (model) {
+	return A2(
+		elm$html$Html$div,
+		_List_Nil,
+		_List_fromArray(
+			[
+				author$project$Main$itemListHeader,
+				author$project$Main$selectedMealItems(model)
+			]));
+};
+var author$project$Main$selectedMealName = function (model) {
+	return A2(
+		elm$html$Html$h2,
+		_List_Nil,
+		A2(
+			elm$core$List$map,
+			function (meal) {
+				return elm$html$Html$text(meal.name);
+			},
+			model.selectedMeal));
+};
+var author$project$Main$selectedMeal = function (model) {
+	return A2(
+		elm$html$Html$div,
+		_List_Nil,
+		_List_fromArray(
+			[
+				author$project$Main$selectedMealName(model),
+				author$project$Main$selectedMealBody(model)
 			]));
 };
 var elm$html$Html$h1 = _VirtualDom_node('h1');
@@ -6259,6 +6403,8 @@ var author$project$Main$titleDiv = A2(
 					elm$html$Html$text('Meal to List App')
 				]))
 		]));
+var elm$core$Basics$neq = _Utils_notEqual;
+var elm$html$Html$Attributes$hidden = elm$html$Html$Attributes$boolProperty('hidden');
 var author$project$Main$view = function (model) {
 	return {
 		body: _List_fromArray(
@@ -6274,8 +6420,22 @@ var author$project$Main$view = function (model) {
 				author$project$Main$grocerySection(model),
 				author$project$Main$lineBreak,
 				author$project$Main$mealListSelection(model),
+				(!_Utils_eq(model.selectedMeal, _List_Nil)) ? author$project$Main$selectedMeal(model) : A2(
+				elm$html$Html$div,
+				_List_fromArray(
+					[
+						elm$html$Html$Attributes$hidden(true)
+					]),
+				_List_Nil),
 				author$project$Main$lineBreak,
-				author$project$Main$groceryListSelection(model)
+				author$project$Main$groceryListSelection(model),
+				(!_Utils_eq(model.selectedGrocery, _List_Nil)) ? author$project$Main$selectedGrocery(model) : A2(
+				elm$html$Html$div,
+				_List_fromArray(
+					[
+						elm$html$Html$Attributes$hidden(true)
+					]),
+				_List_Nil)
 			]),
 		title: 'Meal to List App'
 	};
