@@ -5510,6 +5510,147 @@ var author$project$Main$createMeal = function (model) {
 		model,
 		{itemList: _List_Nil, meal: '', mealList: newMealList});
 };
+var elm$core$Basics$neq = _Utils_notEqual;
+var elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return elm$core$Maybe$Just(x);
+	} else {
+		return elm$core$Maybe$Nothing;
+	}
+};
+var elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
+var author$project$Main$findAndRemoveGroceryItem = F2(
+	function (model, item) {
+		var selectedGroceryItemList = A3(
+			elm$core$List$foldl,
+			F2(
+				function (g, list) {
+					return _Utils_ap(list, g.items);
+				}),
+			_List_Nil,
+			model.selectedGrocery);
+		var newList = A2(
+			elm$core$List$filter,
+			function (i) {
+				return !_Utils_eq(i, item);
+			},
+			selectedGroceryItemList);
+		var groceryName = A2(
+			elm$core$Maybe$withDefault,
+			'',
+			elm$core$List$head(
+				A2(
+					elm$core$List$map,
+					function (grocery) {
+						return grocery.name;
+					},
+					model.selectedGrocery)));
+		var newGrocery = A2(
+			elm$core$List$cons,
+			A2(author$project$Main$Grocery, groceryName, newList),
+			_List_Nil);
+		return _Utils_update(
+			model,
+			{selectedGrocery: newGrocery});
+	});
+var author$project$Main$findAndReplaceUpdatedGrocery = function (model) {
+	var groceryName = A2(
+		elm$core$Maybe$withDefault,
+		'',
+		elm$core$List$head(
+			A2(
+				elm$core$List$map,
+				function (grocery) {
+					return grocery.name;
+				},
+				model.selectedGrocery)));
+	var filteredList = A2(
+		elm$core$List$filter,
+		function (grocery) {
+			return !_Utils_eq(grocery.name, groceryName);
+		},
+		model.groceryListAll);
+	var newList = _Utils_ap(filteredList, model.selectedGrocery);
+	return _Utils_update(
+		model,
+		{groceryListAll: newList});
+};
+var author$project$Main$deleteGroceryItem = F2(
+	function (model, item) {
+		return author$project$Main$findAndReplaceUpdatedGrocery(
+			A2(author$project$Main$findAndRemoveGroceryItem, model, item));
+	});
+var author$project$Main$findAndRemoveMealItem = F2(
+	function (model, item) {
+		var selectedMealItemList = A3(
+			elm$core$List$foldl,
+			F2(
+				function (m, list) {
+					return _Utils_ap(list, m.itemList);
+				}),
+			_List_Nil,
+			model.selectedMeal);
+		var newList = A2(
+			elm$core$List$filter,
+			function (i) {
+				return !_Utils_eq(i, item);
+			},
+			selectedMealItemList);
+		var mealName = A2(
+			elm$core$Maybe$withDefault,
+			'',
+			elm$core$List$head(
+				A2(
+					elm$core$List$map,
+					function (meal) {
+						return meal.name;
+					},
+					model.selectedMeal)));
+		var newMeal = A2(
+			elm$core$List$cons,
+			A2(author$project$Main$Meal, mealName, newList),
+			_List_Nil);
+		return _Utils_update(
+			model,
+			{selectedMeal: newMeal});
+	});
+var author$project$Main$findAndReplaceUpdatedMeal = function (model) {
+	var mealName = A2(
+		elm$core$Maybe$withDefault,
+		'',
+		elm$core$List$head(
+			A2(
+				elm$core$List$map,
+				function (meal) {
+					return meal.name;
+				},
+				model.selectedMeal)));
+	var filteredList = A2(
+		elm$core$List$filter,
+		function (meal) {
+			return !_Utils_eq(meal.name, mealName);
+		},
+		model.mealList);
+	var newList = _Utils_ap(filteredList, model.selectedMeal);
+	return _Utils_update(
+		model,
+		{mealList: newList});
+};
+var author$project$Main$deleteMealItem = F2(
+	function (model, item) {
+		return author$project$Main$findAndReplaceUpdatedMeal(
+			A2(author$project$Main$findAndRemoveMealItem, model, item));
+	});
 var author$project$Main$findSelectedGrocery = F2(
 	function (model, name) {
 		return A2(
@@ -5527,15 +5668,6 @@ var author$project$Main$findSelectedMeal = F2(
 				return _Utils_eq(name, meal.name);
 			},
 			model.mealList);
-	});
-var elm$core$Maybe$withDefault = F2(
-	function (_default, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return value;
-		} else {
-			return _default;
-		}
 	});
 var elm$core$String$toFloat = _String_toFloat;
 var author$project$Main$update = F2(
@@ -5627,8 +5759,16 @@ var author$project$Main$update = F2(
 						model,
 						{selectedGrocery: _List_Nil}),
 					elm$core$Platform$Cmd$none);
+			case 'DeleteMealItem':
+				var item = msg.a;
+				return _Utils_Tuple2(
+					A2(author$project$Main$deleteMealItem, model, item),
+					elm$core$Platform$Cmd$none);
 			default:
-				return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+				var item = msg.a;
+				return _Utils_Tuple2(
+					A2(author$project$Main$deleteGroceryItem, model, item),
+					elm$core$Platform$Cmd$none);
 		}
 	});
 var author$project$Main$AddMeal = {$: 'AddMeal'};
@@ -6300,6 +6440,9 @@ var author$project$Main$mealListSelection = function (model) {
 				author$project$Main$mealNameList(model))
 			]));
 };
+var author$project$Main$DeleteGroceryItem = function (a) {
+	return {$: 'DeleteGroceryItem', a: a};
+};
 var elm$html$Html$i = _VirtualDom_node('i');
 var author$project$Main$selectedGroceryItemMod = function (item) {
 	return A2(
@@ -6364,26 +6507,9 @@ var author$project$Main$selectedGroceryItemMod = function (item) {
 								elm$html$Html$i,
 								_List_fromArray(
 									[
-										elm$html$Html$Attributes$class('fas fa-edit')
-									]),
-								_List_Nil)
-							]))
-					])),
-				A2(
-				elm$html$Html$div,
-				_List_Nil,
-				_List_fromArray(
-					[
-						A2(
-						elm$html$Html$p,
-						_List_Nil,
-						_List_fromArray(
-							[
-								A2(
-								elm$html$Html$i,
-								_List_fromArray(
-									[
-										elm$html$Html$Attributes$class('fas fa-trash')
+										elm$html$Html$Attributes$class('fas fa-trash'),
+										elm$html$Html$Events$onClick(
+										author$project$Main$DeleteGroceryItem(item))
 									]),
 								_List_Nil)
 							]))
@@ -6458,6 +6584,9 @@ var author$project$Main$selectedGrocery = function (model) {
 				author$project$Main$selectedGroceryBody(model)
 			]));
 };
+var author$project$Main$DeleteMealItem = function (a) {
+	return {$: 'DeleteMealItem', a: a};
+};
 var author$project$Main$selectedMealItemMod = function (item) {
 	return A2(
 		elm$html$Html$li,
@@ -6521,26 +6650,9 @@ var author$project$Main$selectedMealItemMod = function (item) {
 								elm$html$Html$i,
 								_List_fromArray(
 									[
-										elm$html$Html$Attributes$class('fas fa-edit')
-									]),
-								_List_Nil)
-							]))
-					])),
-				A2(
-				elm$html$Html$div,
-				_List_Nil,
-				_List_fromArray(
-					[
-						A2(
-						elm$html$Html$p,
-						_List_Nil,
-						_List_fromArray(
-							[
-								A2(
-								elm$html$Html$i,
-								_List_fromArray(
-									[
-										elm$html$Html$Attributes$class('fas fa-trash')
+										elm$html$Html$Attributes$class('fas fa-trash'),
+										elm$html$Html$Events$onClick(
+										author$project$Main$DeleteMealItem(item))
 									]),
 								_List_Nil)
 							]))
@@ -6636,7 +6748,6 @@ var author$project$Main$titleDiv = A2(
 					elm$html$Html$text('Meal to List App')
 				]))
 		]));
-var elm$core$Basics$neq = _Utils_notEqual;
 var elm$html$Html$Attributes$hidden = elm$html$Html$Attributes$boolProperty('hidden');
 var author$project$Main$view = function (model) {
 	return {

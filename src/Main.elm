@@ -90,12 +90,8 @@ type Msg
     | SelectGrocery String 
     | CancelSelectedMeal
     | CancelSelectedGrocery 
-    | EditMealItem Item 
-    | EditGroceryItem Item
     | DeleteMealItem Item  
     | DeleteGroceryItem Item
-    | DeleteMeal
-    | DeleteGrocery
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -147,10 +143,115 @@ update msg model =
                 | selectedGrocery = [] }, Cmd.none )
 
         DeleteMealItem item -> 
-            ( model, Cmd.none )
+            ( deleteMealItem model item, Cmd.none )
 
-        _ ->
-            ( model, Cmd.none )
+        DeleteGroceryItem item -> 
+            ( deleteGroceryItem model item, Cmd.none )
+
+
+-- delete an item from an existing grocery list 
+
+
+deleteGroceryItem : Model -> Item -> Model 
+deleteGroceryItem model item =
+    item 
+        |> findAndRemoveGroceryItem model  
+        |> findAndReplaceUpdatedGrocery 
+
+findAndReplaceUpdatedGrocery : Model -> Model 
+findAndReplaceUpdatedGrocery model =
+    let 
+        groceryName =
+            model.selectedGrocery 
+                |> List.map(\grocery -> grocery.name)
+                |> List.head
+                |> Maybe.withDefault ""
+
+        filteredList =
+            model.groceryListAll  
+                |> List.filter(\grocery -> grocery.name /= groceryName) 
+
+        newList =
+            filteredList ++ model.selectedGrocery 
+
+    in  
+        { model 
+            | groceryListAll = newList }
+
+findAndRemoveGroceryItem : Model -> Item -> Model    
+findAndRemoveGroceryItem model item =
+    let 
+
+        groceryName = 
+            model.selectedGrocery
+                |> List.map(\grocery -> grocery.name) 
+                |> List.head
+                |> Maybe.withDefault ""
+
+        selectedGroceryItemList = 
+            List.foldl(\g list -> list ++ g.items) [] model.selectedGrocery 
+
+        newList = 
+            List.filter(\i -> i /= item) selectedGroceryItemList 
+
+        newGrocery = 
+            (Grocery groceryName newList) :: [] 
+
+    in   
+        { model 
+            | selectedGrocery = newGrocery }
+
+
+-- delete an item from an existing meal 
+
+deleteMealItem : Model -> Item -> Model 
+deleteMealItem model item =
+    item 
+        |> findAndRemoveMealItem model  
+        |> findAndReplaceUpdatedMeal 
+
+findAndReplaceUpdatedMeal : Model -> Model 
+findAndReplaceUpdatedMeal model =
+    let 
+        mealName =
+            model.selectedMeal 
+                |> List.map(\meal -> meal.name)
+                |> List.head
+                |> Maybe.withDefault ""
+
+        filteredList =
+            model.mealList  
+                |> List.filter(\meal -> meal.name /= mealName) 
+
+        newList =
+            filteredList ++ model.selectedMeal 
+
+    in  
+        { model 
+            | mealList = newList }
+
+findAndRemoveMealItem : Model -> Item -> Model    
+findAndRemoveMealItem model item =
+    let 
+
+        mealName = 
+            model.selectedMeal
+                |> List.map(\meal -> meal.name) 
+                |> List.head
+                |> Maybe.withDefault ""
+
+        selectedMealItemList = 
+            List.foldl(\m list -> list ++ m.itemList) [] model.selectedMeal 
+
+        newList = 
+            List.filter(\i -> i /= item) selectedMealItemList 
+
+        newMeal = 
+            (Meal mealName newList) :: [] 
+
+    in   
+        { model 
+            | selectedMeal = newMeal }
 
 
 --find selected grocery list and display
@@ -359,12 +460,6 @@ selectedGroceryItemMod item =
         , div   
             [] 
             [ p [] 
-                [ i [ class "fas fa-edit", onClick (EditGroceryItem item) ] []
-                ]
-            ]
-        , div   
-            [] 
-            [ p [] 
                 [ i [ class "fas fa-trash", onClick (DeleteGroceryItem item) ] []
                 ]
             ]
@@ -439,12 +534,6 @@ selectedMealItemMod item =
         , div
             []
             [ p [] [ text item.unit ]
-            ]
-        , div   
-            [] 
-            [ p [] 
-                [ i [ class "fas fa-edit", onClick (EditMealItem item) ] []
-                ]
             ]
         , div   
             [] 
