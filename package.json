@@ -1,0 +1,22 @@
+{
+  "name": "mealtolistapp",
+  "version": "1.0.0",
+  "description": "converting meal plans to grocery lists",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jakewitcher/Elm_MealToListApp.git"
+  },
+  "author": "Jake Witcher",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jakewitcher/Elm_MealToListApp/issues"
+  },
+  "homepage": "https://github.com/jakewitcher/Elm_MealToListApp#readme",
+  "dependencies": {
+    "express": "^4.16.4"
+  }
+}

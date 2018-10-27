@@ -5771,14 +5771,6 @@ var author$project$Main$update = F2(
 					elm$core$Platform$Cmd$none);
 		}
 	});
-var author$project$Main$AddMeal = {$: 'AddMeal'};
-var author$project$Main$InputGrocery = function (a) {
-	return {$: 'InputGrocery', a: a};
-};
-var author$project$Main$InputMeal = function (a) {
-	return {$: 'InputMeal', a: a};
-};
-var author$project$Main$SaveGrocery = {$: 'SaveGrocery'};
 var elm$core$Basics$identity = function (x) {
 	return x;
 };
@@ -5797,6 +5789,31 @@ var elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
 			return 3;
 	}
 };
+var elm$html$Html$div = _VirtualDom_node('div');
+var elm$json$Json$Encode$string = _Json_wrap;
+var elm$html$Html$Attributes$stringProperty = F2(
+	function (key, string) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			elm$json$Json$Encode$string(string));
+	});
+var elm$html$Html$Attributes$class = elm$html$Html$Attributes$stringProperty('className');
+var author$project$Main$endBreak = A2(
+	elm$html$Html$div,
+	_List_fromArray(
+		[
+			elm$html$Html$Attributes$class('end-break')
+		]),
+	_List_Nil);
+var author$project$Main$AddMeal = {$: 'AddMeal'};
+var author$project$Main$InputGrocery = function (a) {
+	return {$: 'InputGrocery', a: a};
+};
+var author$project$Main$InputMeal = function (a) {
+	return {$: 'InputMeal', a: a};
+};
+var author$project$Main$SaveGrocery = {$: 'SaveGrocery'};
 var elm$html$Html$option = _VirtualDom_node('option');
 var elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var elm$html$Html$text = elm$virtual_dom$VirtualDom$text;
@@ -5818,19 +5835,9 @@ var author$project$Main$mealSelect = function (model) {
 		model.mealList);
 };
 var elm$html$Html$button = _VirtualDom_node('button');
-var elm$html$Html$div = _VirtualDom_node('div');
 var elm$html$Html$form = _VirtualDom_node('form');
 var elm$html$Html$input = _VirtualDom_node('input');
 var elm$html$Html$select = _VirtualDom_node('select');
-var elm$json$Json$Encode$string = _Json_wrap;
-var elm$html$Html$Attributes$stringProperty = F2(
-	function (key, string) {
-		return A2(
-			_VirtualDom_property,
-			key,
-			elm$json$Json$Encode$string(string));
-	});
-var elm$html$Html$Attributes$class = elm$html$Html$Attributes$stringProperty('className');
 var elm$html$Html$Attributes$placeholder = elm$html$Html$Attributes$stringProperty('placeholder');
 var elm$json$Json$Encode$bool = _Json_wrap;
 var elm$html$Html$Attributes$boolProperty = F2(
@@ -6047,7 +6054,8 @@ var author$project$Main$groceryNameList = function (model) {
 				_List_fromArray(
 					[
 						elm$html$Html$Events$onClick(
-						author$project$Main$SelectGrocery(grocery.name))
+						author$project$Main$SelectGrocery(grocery.name)),
+						elm$html$Html$Attributes$class('meal-grocery-list')
 					]),
 				_List_fromArray(
 					[
@@ -6320,49 +6328,49 @@ var author$project$Main$mealForm = function (model) {
 										_List_Nil,
 										_List_fromArray(
 											[
-												elm$html$Html$text('ounce')
+												elm$html$Html$text('ounce(s)')
 											])),
 										A2(
 										elm$html$Html$option,
 										_List_Nil,
 										_List_fromArray(
 											[
-												elm$html$Html$text('gallon')
+												elm$html$Html$text('gallon(s)')
 											])),
 										A2(
 										elm$html$Html$option,
 										_List_Nil,
 										_List_fromArray(
 											[
-												elm$html$Html$text('quart')
+												elm$html$Html$text('quart(s)')
 											])),
 										A2(
 										elm$html$Html$option,
 										_List_Nil,
 										_List_fromArray(
 											[
-												elm$html$Html$text('pint')
+												elm$html$Html$text('pint(s)')
 											])),
 										A2(
 										elm$html$Html$option,
 										_List_Nil,
 										_List_fromArray(
 											[
-												elm$html$Html$text('liter')
+												elm$html$Html$text('liter(s)')
 											])),
 										A2(
 										elm$html$Html$option,
 										_List_Nil,
 										_List_fromArray(
 											[
-												elm$html$Html$text('item')
+												elm$html$Html$text('item(s)')
 											])),
 										A2(
 										elm$html$Html$option,
 										_List_Nil,
 										_List_fromArray(
 											[
-												elm$html$Html$text('package')
+												elm$html$Html$text('package(s)')
 											]))
 									])),
 								A2(
@@ -6418,7 +6426,8 @@ var author$project$Main$mealNameList = function (model) {
 				_List_fromArray(
 					[
 						elm$html$Html$Events$onClick(
-						author$project$Main$SelectMeal(meal.name))
+						author$project$Main$SelectMeal(meal.name)),
+						elm$html$Html$Attributes$class('meal-grocery-list')
 					]),
 				_List_fromArray(
 					[
@@ -6546,7 +6555,10 @@ var author$project$Main$CancelSelectedGrocery = {$: 'CancelSelectedGrocery'};
 var author$project$Main$selectedGroceryName = function (model) {
 	return A2(
 		elm$html$Html$div,
-		_List_Nil,
+		_List_fromArray(
+			[
+				elm$html$Html$Attributes$class('selected-header')
+			]),
 		_List_fromArray(
 			[
 				A2(
@@ -6689,7 +6701,10 @@ var author$project$Main$CancelSelectedMeal = {$: 'CancelSelectedMeal'};
 var author$project$Main$selectedMealName = function (model) {
 	return A2(
 		elm$html$Html$div,
-		_List_Nil,
+		_List_fromArray(
+			[
+				elm$html$Html$Attributes$class('selected-header')
+			]),
 		_List_fromArray(
 			[
 				A2(
@@ -6759,10 +6774,6 @@ var author$project$Main$view = function (model) {
 				author$project$Main$mealForm(model),
 				author$project$Main$itemSection(model),
 				author$project$Main$lineBreak,
-				author$project$Main$groceryFormHeader,
-				author$project$Main$groceryForm(model),
-				author$project$Main$grocerySection(model),
-				author$project$Main$lineBreak,
 				author$project$Main$mealListSelection(model),
 				(!_Utils_eq(model.selectedMeal, _List_Nil)) ? author$project$Main$selectedMeal(model) : A2(
 				elm$html$Html$div,
@@ -6772,6 +6783,10 @@ var author$project$Main$view = function (model) {
 					]),
 				_List_Nil),
 				author$project$Main$lineBreak,
+				author$project$Main$groceryFormHeader,
+				author$project$Main$groceryForm(model),
+				author$project$Main$grocerySection(model),
+				author$project$Main$lineBreak,
 				author$project$Main$groceryListSelection(model),
 				(!_Utils_eq(model.selectedGrocery, _List_Nil)) ? author$project$Main$selectedGrocery(model) : A2(
 				elm$html$Html$div,
@@ -6779,7 +6794,8 @@ var author$project$Main$view = function (model) {
 					[
 						elm$html$Html$Attributes$hidden(true)
 					]),
-				_List_Nil)
+				_List_Nil),
+				author$project$Main$endBreak
 			]),
 		title: 'Meal to List App'
 	};

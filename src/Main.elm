@@ -409,15 +409,16 @@ view model =
         , mealForm model
         , itemSection model
         , lineBreak
+        , mealListSelection model
+        , if (model.selectedMeal /= []) then selectedMeal model else div [ hidden True ] []
+        , lineBreak
         , groceryFormHeader
         , groceryForm model
         , grocerySection model
         , lineBreak
-        , mealListSelection model
-        , if (model.selectedMeal /= []) then selectedMeal model else div [ hidden True ] []
-        , lineBreak
         , groceryListSelection model
         , if (model.selectedGrocery /= []) then selectedGrocery model else div [ hidden True ] []
+        , endBreak 
         ]
     }
 
@@ -426,17 +427,20 @@ titleDiv : Html Msg
 titleDiv =
     div [ class "page-header" ] [ h1 [ id "title" ] [ text "Meal to List App" ] ]
 
-
 lineBreak : Html Msg
 lineBreak =
     div [ class "header-break" ] []
+
+endBreak : Html Msg
+endBreak =
+    div [ class "end-break" ] []
 
 
 -- grocery list selection component
 
 selectedGroceryName : Model -> Html Msg
 selectedGroceryName model =
-    div [] 
+    div [ class "selected-header" ] 
         [ h2 [] 
             (List.map(\grocery -> text grocery.name) model.selectedGrocery)
             , h2 [] [ i [ class "fas fa-ban", onClick CancelSelectedGrocery ] []]
@@ -497,7 +501,7 @@ groceryListSelectionHeader =
 
 groceryNameList : Model -> List (Html Msg)
 groceryNameList model =
-    List.map (\grocery -> li [ onClick (SelectGrocery grocery.name) ] [ text grocery.name ]) model.groceryListAll
+    List.map (\grocery -> li [ onClick (SelectGrocery grocery.name), class "meal-grocery-list" ] [ text grocery.name ]) model.groceryListAll
 
 
 groceryListSelection : Model -> Html Msg
@@ -514,7 +518,7 @@ groceryListSelection model =
 
 selectedMealName : Model -> Html Msg
 selectedMealName model =
-    div [] 
+    div [ class "selected-header"] 
         [ h2 [] 
             (List.map(\meal -> text meal.name) model.selectedMeal)
             , h2 [] [ i [ class "fas fa-ban", onClick CancelSelectedMeal ] []]
@@ -573,7 +577,7 @@ mealListSelectionHeader =
 
 mealNameList : Model -> List (Html Msg)
 mealNameList model =
-    List.map (\meal -> li [ onClick (SelectMeal meal.name) ] [ text meal.name ]) model.mealList
+    List.map (\meal -> li [ onClick (SelectMeal meal.name), class "meal-grocery-list" ] [ text meal.name ]) model.mealList
 
 
 mealListSelection : Model -> Html Msg
@@ -758,13 +762,13 @@ mealForm model =
                     , required True
                     ]
                     [ option [] [ text "pound(s)" ]
-                    , option [] [ text "ounce" ]
-                    , option [] [ text "gallon" ]
-                    , option [] [ text "quart" ]
-                    , option [] [ text "pint" ]
-                    , option [] [ text "liter" ]
-                    , option [] [ text "item" ]
-                    , option [] [ text "package" ]
+                    , option [] [ text "ounce(s)" ]
+                    , option [] [ text "gallon(s)" ]
+                    , option [] [ text "quart(s)" ]
+                    , option [] [ text "pint(s)" ]
+                    , option [] [ text "liter(s)" ]
+                    , option [] [ text "item(s)" ]
+                    , option [] [ text "package(s)" ]
                     ]
                 , button [ type_ "submit", class "form-button" ] [ text "Add" ]
                 ]
