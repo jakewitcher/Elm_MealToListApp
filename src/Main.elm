@@ -88,8 +88,12 @@ type Msg
     | SaveGrocery
     | SelectMeal String
     | SelectGrocery String 
-    | EditMeal
-    | EditGrocery
+    | CancelSelectedMeal
+    | CancelSelectedGrocery 
+    | EditMealItem Item 
+    | EditGroceryItem Item
+    | DeleteMealItem Item  
+    | DeleteGroceryItem Item
     | DeleteMeal
     | DeleteGrocery
 
@@ -133,6 +137,17 @@ update msg model =
             ( { model
                 | selectedGrocery =
                     findSelectedGrocery model grocery }, Cmd.none )
+
+        CancelSelectedMeal -> 
+            ( { model 
+                | selectedMeal = [] }, Cmd.none )
+
+        CancelSelectedGrocery -> 
+            ( { model 
+                | selectedGrocery = [] }, Cmd.none )
+
+        DeleteMealItem item -> 
+            ( model, Cmd.none )
 
         _ ->
             ( model, Cmd.none )
@@ -320,15 +335,49 @@ lineBreak =
 
 selectedGroceryName : Model -> Html Msg
 selectedGroceryName model =
-    h2 [] 
-        (List.map(\grocery -> text grocery.name) model.selectedGrocery)
+    div [] 
+        [ h2 [] 
+            (List.map(\grocery -> text grocery.name) model.selectedGrocery)
+            , h2 [] [ i [ class "fas fa-ban", onClick CancelSelectedGrocery ] []]
+        ]
+
+selectedGroceryItemMod : Item -> Html Msg
+selectedGroceryItemMod item =
+    li [ class "item-list" ]
+        [ div
+            []
+            [ p [] [ text item.name ]
+            ]
+        , div
+            []
+            [ p [] [ text (String.fromFloat item.amount) ]
+            ]
+        , div
+            []
+            [ p [] [ text item.unit ]
+            ]
+        , div   
+            [] 
+            [ p [] 
+                [ i [ class "fas fa-edit", onClick (EditGroceryItem item) ] []
+                ]
+            ]
+        , div   
+            [] 
+            [ p [] 
+                [ i [ class "fas fa-trash", onClick (DeleteGroceryItem item) ] []
+                ]
+            ]
+        ]
 
 selectedGroceryItems : Model -> Html Msg
 selectedGroceryItems model =
     model.selectedGrocery
         |> List.foldl (\grocery list-> grocery.items ++ list ) []
-        |> List.map itemMod
+        |> List.map selectedGroceryItemMod
         |> ul []
+
+--, i [ class "fas fa-edit"] []
 
 selectedGroceryBody : Model -> Html Msg
 selectedGroceryBody model =
@@ -370,14 +419,46 @@ groceryListSelection model =
 
 selectedMealName : Model -> Html Msg
 selectedMealName model =
-    h2 [] 
-        (List.map(\meal -> text meal.name) model.selectedMeal)
+    div [] 
+        [ h2 [] 
+            (List.map(\meal -> text meal.name) model.selectedMeal)
+            , h2 [] [ i [ class "fas fa-ban", onClick CancelSelectedMeal ] []]
+        ]
+
+selectedMealItemMod : Item -> Html Msg
+selectedMealItemMod item =
+    li [ class "item-list" ]
+        [ div
+            []
+            [ p [] [ text item.name ]
+            ]
+        , div
+            []
+            [ p [] [ text (String.fromFloat item.amount) ]
+            ]
+        , div
+            []
+            [ p [] [ text item.unit ]
+            ]
+        , div   
+            [] 
+            [ p [] 
+                [ i [ class "fas fa-edit", onClick (EditMealItem item) ] []
+                ]
+            ]
+        , div   
+            [] 
+            [ p [] 
+                [ i [ class "fas fa-trash", onClick (DeleteMealItem item) ] []
+                ]
+            ]
+        ]
 
 selectedMealItems : Model -> Html Msg
 selectedMealItems model =
     model.selectedMeal
         |> List.foldl (\meal list-> meal.itemList ++ list ) []
-        |> List.map itemMod
+        |> List.map selectedMealItemMod
         |> ul []
 
 selectedMealBody : Model -> Html Msg

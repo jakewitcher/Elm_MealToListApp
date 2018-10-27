@@ -5615,6 +5615,18 @@ var author$project$Main$update = F2(
 							selectedGrocery: A2(author$project$Main$findSelectedGrocery, model, grocery)
 						}),
 					elm$core$Platform$Cmd$none);
+			case 'CancelSelectedMeal':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{selectedMeal: _List_Nil}),
+					elm$core$Platform$Cmd$none);
+			case 'CancelSelectedGrocery':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{selectedGrocery: _List_Nil}),
+					elm$core$Platform$Cmd$none);
 			default:
 				return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 		}
@@ -6288,13 +6300,103 @@ var author$project$Main$mealListSelection = function (model) {
 				author$project$Main$mealNameList(model))
 			]));
 };
+var elm$html$Html$i = _VirtualDom_node('i');
+var author$project$Main$selectedGroceryItemMod = function (item) {
+	return A2(
+		elm$html$Html$li,
+		_List_fromArray(
+			[
+				elm$html$Html$Attributes$class('item-list')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						elm$html$Html$p,
+						_List_Nil,
+						_List_fromArray(
+							[
+								elm$html$Html$text(item.name)
+							]))
+					])),
+				A2(
+				elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						elm$html$Html$p,
+						_List_Nil,
+						_List_fromArray(
+							[
+								elm$html$Html$text(
+								elm$core$String$fromFloat(item.amount))
+							]))
+					])),
+				A2(
+				elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						elm$html$Html$p,
+						_List_Nil,
+						_List_fromArray(
+							[
+								elm$html$Html$text(item.unit)
+							]))
+					])),
+				A2(
+				elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						elm$html$Html$p,
+						_List_Nil,
+						_List_fromArray(
+							[
+								A2(
+								elm$html$Html$i,
+								_List_fromArray(
+									[
+										elm$html$Html$Attributes$class('fas fa-edit')
+									]),
+								_List_Nil)
+							]))
+					])),
+				A2(
+				elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						elm$html$Html$p,
+						_List_Nil,
+						_List_fromArray(
+							[
+								A2(
+								elm$html$Html$i,
+								_List_fromArray(
+									[
+										elm$html$Html$Attributes$class('fas fa-trash')
+									]),
+								_List_Nil)
+							]))
+					]))
+			]));
+};
 var author$project$Main$selectedGroceryItems = function (model) {
 	return A2(
 		elm$html$Html$ul,
 		_List_Nil,
 		A2(
 			elm$core$List$map,
-			author$project$Main$itemMod,
+			author$project$Main$selectedGroceryItemMod,
 			A3(
 				elm$core$List$foldl,
 				F2(
@@ -6314,16 +6416,37 @@ var author$project$Main$selectedGroceryBody = function (model) {
 				author$project$Main$selectedGroceryItems(model)
 			]));
 };
+var author$project$Main$CancelSelectedGrocery = {$: 'CancelSelectedGrocery'};
 var author$project$Main$selectedGroceryName = function (model) {
 	return A2(
-		elm$html$Html$h2,
+		elm$html$Html$div,
 		_List_Nil,
-		A2(
-			elm$core$List$map,
-			function (grocery) {
-				return elm$html$Html$text(grocery.name);
-			},
-			model.selectedGrocery));
+		_List_fromArray(
+			[
+				A2(
+				elm$html$Html$h2,
+				_List_Nil,
+				A2(
+					elm$core$List$map,
+					function (grocery) {
+						return elm$html$Html$text(grocery.name);
+					},
+					model.selectedGrocery)),
+				A2(
+				elm$html$Html$h2,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						elm$html$Html$i,
+						_List_fromArray(
+							[
+								elm$html$Html$Attributes$class('fas fa-ban'),
+								elm$html$Html$Events$onClick(author$project$Main$CancelSelectedGrocery)
+							]),
+						_List_Nil)
+					]))
+			]));
 };
 var author$project$Main$selectedGrocery = function (model) {
 	return A2(
@@ -6335,13 +6458,102 @@ var author$project$Main$selectedGrocery = function (model) {
 				author$project$Main$selectedGroceryBody(model)
 			]));
 };
+var author$project$Main$selectedMealItemMod = function (item) {
+	return A2(
+		elm$html$Html$li,
+		_List_fromArray(
+			[
+				elm$html$Html$Attributes$class('item-list')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						elm$html$Html$p,
+						_List_Nil,
+						_List_fromArray(
+							[
+								elm$html$Html$text(item.name)
+							]))
+					])),
+				A2(
+				elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						elm$html$Html$p,
+						_List_Nil,
+						_List_fromArray(
+							[
+								elm$html$Html$text(
+								elm$core$String$fromFloat(item.amount))
+							]))
+					])),
+				A2(
+				elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						elm$html$Html$p,
+						_List_Nil,
+						_List_fromArray(
+							[
+								elm$html$Html$text(item.unit)
+							]))
+					])),
+				A2(
+				elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						elm$html$Html$p,
+						_List_Nil,
+						_List_fromArray(
+							[
+								A2(
+								elm$html$Html$i,
+								_List_fromArray(
+									[
+										elm$html$Html$Attributes$class('fas fa-edit')
+									]),
+								_List_Nil)
+							]))
+					])),
+				A2(
+				elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						elm$html$Html$p,
+						_List_Nil,
+						_List_fromArray(
+							[
+								A2(
+								elm$html$Html$i,
+								_List_fromArray(
+									[
+										elm$html$Html$Attributes$class('fas fa-trash')
+									]),
+								_List_Nil)
+							]))
+					]))
+			]));
+};
 var author$project$Main$selectedMealItems = function (model) {
 	return A2(
 		elm$html$Html$ul,
 		_List_Nil,
 		A2(
 			elm$core$List$map,
-			author$project$Main$itemMod,
+			author$project$Main$selectedMealItemMod,
 			A3(
 				elm$core$List$foldl,
 				F2(
@@ -6361,16 +6573,37 @@ var author$project$Main$selectedMealBody = function (model) {
 				author$project$Main$selectedMealItems(model)
 			]));
 };
+var author$project$Main$CancelSelectedMeal = {$: 'CancelSelectedMeal'};
 var author$project$Main$selectedMealName = function (model) {
 	return A2(
-		elm$html$Html$h2,
+		elm$html$Html$div,
 		_List_Nil,
-		A2(
-			elm$core$List$map,
-			function (meal) {
-				return elm$html$Html$text(meal.name);
-			},
-			model.selectedMeal));
+		_List_fromArray(
+			[
+				A2(
+				elm$html$Html$h2,
+				_List_Nil,
+				A2(
+					elm$core$List$map,
+					function (meal) {
+						return elm$html$Html$text(meal.name);
+					},
+					model.selectedMeal)),
+				A2(
+				elm$html$Html$h2,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						elm$html$Html$i,
+						_List_fromArray(
+							[
+								elm$html$Html$Attributes$class('fas fa-ban'),
+								elm$html$Html$Events$onClick(author$project$Main$CancelSelectedMeal)
+							]),
+						_List_Nil)
+					]))
+			]));
 };
 var author$project$Main$selectedMeal = function (model) {
 	return A2(
