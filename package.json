@@ -2,7 +2,7 @@
   "name": "mealtolistapp",
   "version": "1.0.0",
   "description": "converting meal plans to grocery lists",
-  "main": "server.js",
+  "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
