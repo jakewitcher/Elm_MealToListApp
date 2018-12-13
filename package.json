@@ -4,7 +4,9 @@
   "description": "converting meal plans to grocery lists",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "heroku-postbuild": "elm make src/Main.elm --optimize --output=public/main.js"
   },
   "repository": {
     "type": "git",
